@@ -6,11 +6,9 @@ namespace BdClasses;
 
 public partial class ConstructionContext : DbContext
 {
-    private DbContextOptions<ConstructionContext> options;
     public ConstructionContext(DbContextOptions<ConstructionContext> options)
         : base(options)
     {
-        this.options = options;
     }
 
     public virtual DbSet<GroupingPropertiesForItem> GroupingPropertiesForItems { get; set; }
@@ -70,7 +68,6 @@ public partial class ConstructionContext : DbContext
             entity.HasIndex(e => e.Name, "unGrCon").IsUnique();
 
             entity.Property(e => e.Id).UseIdentityAlwaysColumn();
-            entity.Property(e => e.Name).HasColumnType("character varying(255)[]");
         });
 
         modelBuilder.Entity<Item>(entity =>
@@ -141,7 +138,6 @@ public partial class ConstructionContext : DbContext
             entity.HasIndex(e => e.Name, "unName").IsUnique();
 
             entity.Property(e => e.Id).UseIdentityAlwaysColumn();
-            entity.Property(e => e.Name).HasColumnType("character varying(255)[]");
         });
 
         modelBuilder.Entity<Object>(entity =>
@@ -151,7 +147,6 @@ public partial class ConstructionContext : DbContext
             entity.Property(e => e.Id).UseIdentityAlwaysColumn();
             entity.Property(e => e.Address).HasColumnType("character varying(255)[]");
             entity.Property(e => e.Description).HasColumnType("character varying(255)[]");
-            entity.Property(e => e.Name).HasColumnType("character varying(255)[]");
         });
 
         modelBuilder.Entity<Permission>(entity =>
@@ -161,7 +156,6 @@ public partial class ConstructionContext : DbContext
             entity.HasIndex(e => e.Name, "perUn").IsUnique();
 
             entity.Property(e => e.Id).UseIdentityAlwaysColumn();
-            entity.Property(e => e.Name).HasColumnType("character varying(255)[]");
         });
 
         modelBuilder.Entity<PermissionsForRole>(entity =>
@@ -186,7 +180,6 @@ public partial class ConstructionContext : DbContext
             entity.HasIndex(e => e.Name, "unNPeod").IsUnique();
 
             entity.Property(e => e.Id).UseIdentityAlwaysColumn();
-            entity.Property(e => e.Name).HasColumnType("character varying(255)[]");
         });
 
         modelBuilder.Entity<Role>(entity =>
@@ -196,7 +189,6 @@ public partial class ConstructionContext : DbContext
             entity.HasIndex(e => e.Name, "roleUn").IsUnique();
 
             entity.Property(e => e.Id).UseIdentityAlwaysColumn();
-            entity.Property(e => e.Name).HasColumnType("character varying(255)[]");
         });
 
         modelBuilder.Entity<RolesOfUser>(entity =>
@@ -225,7 +217,6 @@ public partial class ConstructionContext : DbContext
             entity.HasIndex(e => e.Name, "toi").IsUnique();
 
             entity.Property(e => e.Id).UseIdentityAlwaysColumn();
-            entity.Property(e => e.Name).HasColumnType("character varying(255)[]");
         });
 
         modelBuilder.Entity<TypesOfMetaDatum>(entity =>
@@ -235,7 +226,6 @@ public partial class ConstructionContext : DbContext
             entity.HasIndex(e => e.Name, "unMtName").IsUnique();
 
             entity.Property(e => e.Id).UseIdentityAlwaysColumn();
-            entity.Property(e => e.Name).HasColumnType("character varying(255)[]");
         });
 
         modelBuilder.Entity<TypesOfUnit>(entity =>
@@ -247,7 +237,6 @@ public partial class ConstructionContext : DbContext
             entity.HasIndex(e => e.Name, "tyUn").IsUnique();
 
             entity.Property(e => e.Id).UseIdentityAlwaysColumn();
-            entity.Property(e => e.Name).HasColumnType("character varying(255)[]");
         });
 
         modelBuilder.Entity<User>(entity =>
@@ -257,7 +246,6 @@ public partial class ConstructionContext : DbContext
             entity.HasIndex(e => e.Name, "usName").IsUnique();
 
             entity.Property(e => e.Id).UseIdentityAlwaysColumn();
-            entity.Property(e => e.Name).HasColumnType("character varying(255)[]");
             entity.Property(e => e.Password).HasColumnType("character varying(255)[]");
         });
 

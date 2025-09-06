@@ -41,6 +41,7 @@ namespace AccountingSystemService.Validators
                     IssuerSigningKey = new SymmetricSecurityKey(key),
                     ValidateIssuer = false, // Отключаем проверку издателя (если не используется)
                     ValidateAudience = false, // Отключаем проверку аудитории (если не используется)
+                    ValidateLifetime = false,
                 }, out SecurityToken validatedToken);
 
 

@@ -1,4 +1,5 @@
 using AccountingSystemService;
+using AccountingSystemService.Interfaces;
 
 using Grpc.Core;
 
@@ -9,9 +10,10 @@ namespace AccountingSystemService.Services
     [Authorize]
     public class AccountingService : AccountingSystem.AccountingSystemBase
     {
-        public AccountingService() 
+        private IErrorHandler ErrorHandler { get; set; }
+        public AccountingService(IErrorHandler errorHandler) 
         { 
-
+            ErrorHandler = errorHandler;
         }
     }
 }

@@ -13,6 +13,8 @@ public partial class ItemMetaDatum
 
     public int ItemId { get; set; }
 
+    public string? Name { get; set; }
+
     public virtual TypesOfMetaDatum DataType { get; set; } = null!;
 
     public virtual Item Item { get; set; } = null!;

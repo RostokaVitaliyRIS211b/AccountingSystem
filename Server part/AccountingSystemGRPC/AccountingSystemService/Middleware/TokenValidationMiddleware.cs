@@ -20,8 +20,7 @@ namespace AccountingSystemService.Middleware
         {
             var excludedPaths = new List<string>
             {
-                "/Authentification.AuthentificationService/Authentificate",// Маршрут аутентификации,
-                "/Authentification.AuthentificationService/CallBack",
+                "/authService.AuthService/Authentificate",// Маршрут аутентификации,
                 "/v1/auth"// Маршрут аутентификации
             };
             if (context.Request.Path.HasValue)

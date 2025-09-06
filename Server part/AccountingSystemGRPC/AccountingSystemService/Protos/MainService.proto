@@ -10,4 +10,24 @@ service AccountingSystem {
   
 }
 
+message ProtoUser{
+	int32 id = 1;
+	string name = 2;
+	repeated int32 roles = 3;
+}
+
+message ProtoRole{
+	int32 id = 1;
+	string name = 2;
+	repeated int32 permissions = 3;
+}
+
+message ProtoPermission{
+	int32 id = 1;
+	string name = 2;
+}
+
+message ProtoPermissions{
+	repeated int32 permissions = 3;
+}
 

@@ -7,7 +7,7 @@ public partial class Object
 {
     public int Id { get; set; }
 
-    public List<string> Name { get; set; } = null!;
+    public string Name { get; set; } = null!;
 
     public List<string>? Description { get; set; }
 
