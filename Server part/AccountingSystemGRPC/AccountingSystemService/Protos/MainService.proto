@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+option csharp_namespace = "AccountingSystemService";
+
+package mainService;
+
+
+service AccountingSystem {
+  
+  
+}
+
+
