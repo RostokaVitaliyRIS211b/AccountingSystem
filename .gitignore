@@ -1,0 +1,27 @@
+# Visual Studio
+**/.vs/
+**/VSWorkspaceState.json
+**/*.csproj.user
+**/*.suo
+
+# Build results
+**/[Dd]ebug/
+**/[Rr]elease/
+**/x64/
+**/x86/
+**/[Bb]in/
+**/[Oo]bj/
+**/[Ll]og/
+**/[Ll]ogs/
+
+# IDE
+**/.idea/
+**/.vscode/
+
+# Другие временные файлы
+**/*.user
+**/*.userosscache
+**/*.sln.docstates
+**/*.opensdf
+**/*.sdf
+**/*.VC.db
