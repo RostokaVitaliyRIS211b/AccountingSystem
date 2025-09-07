@@ -61,6 +61,16 @@ namespace AccountingSystemService.Wrappers
             }
         }
 
+        public string Password
+        {
+            get => ProtoObject.Password;
+            set
+            {
+                ProtoObject.Password = value;
+                RaisePropertyChanged(nameof(Password));
+            }
+        }
+
         private ObservableCollection<int> roles;
         public ObservableCollection<int> Roles
         {

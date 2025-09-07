@@ -28,7 +28,7 @@ namespace AccountingSystemService.Services
             {
                 using var db = DbContextHelper.GetConstructionContext();
                 var user = db.Users.FirstOrDefault(x => x.Name == request.Username);
-                if (user is not null)
+                if (user is not null && request.Password == user.Password)
                 {
                     var rolesOfUser = db.RolesOfUsers.Where(x => x.UserId == user.Id).Select(x => x.RoleId).ToList();
                     var roles = db.Roles.Where(x => rolesOfUser.Contains(x.Id)).Select(x => x.Id).ToList();

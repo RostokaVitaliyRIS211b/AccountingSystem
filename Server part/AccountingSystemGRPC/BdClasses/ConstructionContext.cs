@@ -6,7 +6,6 @@ namespace BdClasses;
 
 public partial class ConstructionContext : DbContext
 {
-
     public ConstructionContext(DbContextOptions<ConstructionContext> options)
         : base(options)
     {
@@ -246,7 +245,6 @@ public partial class ConstructionContext : DbContext
             entity.HasIndex(e => e.Name, "usName").IsUnique();
 
             entity.Property(e => e.Id).UseIdentityAlwaysColumn();
-            entity.Property(e => e.Password).HasColumnType("character varying(255)[]");
         });
 
         OnModelCreatingPartial(modelBuilder);
