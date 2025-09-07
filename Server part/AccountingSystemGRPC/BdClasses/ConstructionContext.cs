@@ -6,6 +6,7 @@ namespace BdClasses;
 
 public partial class ConstructionContext : DbContext
 {
+
     public ConstructionContext(DbContextOptions<ConstructionContext> options)
         : base(options)
     {
@@ -80,6 +81,7 @@ public partial class ConstructionContext : DbContext
 
             entity.Property(e => e.Id).UseIdentityAlwaysColumn();
             entity.Property(e => e.CountOfUnits).HasDefaultValue(1);
+            entity.Property(e => e.CountOfUsedUnits).HasDefaultValue(0);
             entity.Property(e => e.ExcpectedCost).HasDefaultValue(1);
             entity.Property(e => e.PricePerUnit).HasDefaultValue(1);
 
@@ -145,8 +147,6 @@ public partial class ConstructionContext : DbContext
             entity.HasKey(e => e.Id).HasName("Objects_pkey");
 
             entity.Property(e => e.Id).UseIdentityAlwaysColumn();
-            entity.Property(e => e.Address).HasColumnType("character varying(255)[]");
-            entity.Property(e => e.Description).HasColumnType("character varying(255)[]");
         });
 
         modelBuilder.Entity<Permission>(entity =>

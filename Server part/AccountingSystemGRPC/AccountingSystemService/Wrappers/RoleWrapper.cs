@@ -1,33 +1,37 @@
-﻿using System.Collections.ObjectModel;
+﻿using BdClasses;
+
+using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 
 namespace AccountingSystemService.Wrappers
 {
-    public sealed partial class UserWrapper : INotifyPropertyChanged
+    public sealed partial class RoleWrapper : INotifyPropertyChanged
     {
-        public UserWrapper()
+        public RoleWrapper()
         {
-            ProtoObject = new ProtoUser();
+            
+            ProtoObject = new ProtoRole();
             InitializeCollections();
             Id = -1;
         }
 
-        internal UserWrapper(ProtoUser proto)
+        internal RoleWrapper(ProtoRole proto)
         {
-            ProtoObject = proto ?? new ProtoUser();
+            ProtoObject = proto ?? new ProtoRole();
             InitializeCollections();
         }
 
         private void InitializeCollections()
         {
-            roles = new ObservableCollection<int>(ProtoObject.Roles);
-            roles.CollectionChanged += OnRolesCollectionChanged;
+            permissions = new ObservableCollection<int>(
+                ProtoObject.Permissions);
+            permissions.CollectionChanged += OnPermissionsCollectionChanged;
         }
 
         #region ProtoFields
 
-        internal ProtoUser ProtoObject { get; init; }
+        internal ProtoRole ProtoObject { get; init; }
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -61,33 +65,33 @@ namespace AccountingSystemService.Wrappers
             }
         }
 
-        private ObservableCollection<int> roles;
-        public ObservableCollection<int> Roles
+        private ObservableCollection<int> permissions;
+        public ObservableCollection<int> Permissions
         {
-            get => roles;
+            get => permissions;
             set
             {
-                if (roles != null)
-                    roles.CollectionChanged -= OnRolesCollectionChanged;
+                if (permissions != null)
+                    permissions.CollectionChanged -= OnPermissionsCollectionChanged;
 
-                roles = value ?? new ObservableCollection<int>();
-                roles.CollectionChanged += OnRolesCollectionChanged;
+                permissions = value ?? new ObservableCollection<int>();
+                permissions.CollectionChanged += OnPermissionsCollectionChanged;
 
-                SyncRoles();
-                RaisePropertyChanged(nameof(Roles));
+                SyncPermissions();
+                RaisePropertyChanged(nameof(Permissions));
             }
         }
 
-        private void OnRolesCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        private void OnPermissionsCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
-            SyncRoles();
-            RaisePropertyChanged(nameof(Roles));
+            SyncPermissions();
+            RaisePropertyChanged(nameof(Permissions));
         }
 
-        private void SyncRoles()
+        private void SyncPermissions()
         {
-            ProtoObject.Roles.Clear();
-            ProtoObject.Roles.AddRange(roles);
+            ProtoObject.Permissions.Clear();
+            ProtoObject.Permissions.AddRange(permissions);
         }
 
         #endregion

@@ -9,9 +9,9 @@ public partial class Object
 
     public string Name { get; set; } = null!;
 
-    public List<string>? Description { get; set; }
+    public string? Description { get; set; }
 
-    public List<string> Address { get; set; } = null!;
+    public string Address { get; set; } = null!;
 
     public virtual ICollection<Item> Items { get; set; } = new List<Item>();
 }

@@ -25,6 +25,8 @@ public partial class Item
 
     public int NameId { get; set; }
 
+    public int CountOfUsedUnits { get; set; }
+
     public virtual ICollection<GroupingPropertiesForItem> GroupingPropertiesForItems { get; set; } = new List<GroupingPropertiesForItem>();
 
     public virtual ICollection<ItemMetaDatum> ItemMetaData { get; set; } = new List<ItemMetaDatum>();

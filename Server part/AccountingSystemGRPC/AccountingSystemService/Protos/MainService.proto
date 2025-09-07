@@ -13,13 +13,15 @@ service AccountingSystem {
 message ProtoUser{
 	int32 id = 1;
 	string name = 2;
-	repeated int32 roles = 3;
+	string description = 3;
+	repeated int32 roles = 4;
 }
 
 message ProtoRole{
 	int32 id = 1;
 	string name = 2;
-	repeated int32 permissions = 3;
+	string description = 3;
+	repeated int32 permissions = 4;
 }
 
 message ProtoPermission{
@@ -29,5 +31,68 @@ message ProtoPermission{
 
 message ProtoPermissions{
 	repeated int32 permissions = 3;
+}
+
+message ProtoItemMetaData{
+	int32 id = 1;
+	string name = 2;
+	int32 itemId = 3;
+	bytes data = 4;
+	int32 typeId = 5;
+}
+
+message ProtoGroupingProperty{
+	int32 id = 1;
+	string name = 2;
+}
+
+message ProtoJournalRecord{
+	int32 id = 1;
+	string text = 2;
+}
+
+message ProtoJournal{
+	repeated ProtoJournalRecord records = 1;
+}
+
+message ProtoNameItem{
+	int32 id = 1;
+	string name = 2;
+}
+
+message ProtoProducer{
+	int32 id = 1;
+	string name = 2;
+}
+
+message ProtoTypeOfUnit{
+	int32 id = 1;
+	string name = 2;
+}
+
+message ProtoTypeOfItem{
+	int32 id = 1;
+	string name = 2;
+}
+
+message ProtoObject{
+	int32 id = 1;
+	string name = 2;
+	string description = 3;
+	string address = 4;
+}
+
+message ProtoItem{
+	int32 id = 1;
+	ProtoObject obj = 2;
+	ProtoTypeOfUnit unitType = 3;
+	int32 countOfUnits = 4;
+	int32 pricePerUnit = 5;
+	int32 ExpectedCost = 6;
+	ProtoProducer producer = 7;
+	string description = 8;
+	ProtoTypeOfItem type = 9;
+	ProtoNameItem nameItem = 10;
+	int32 countOfUsedUnits = 11;
 }
 

@@ -11,5 +11,7 @@ public partial class User
 
     public List<string> Password { get; set; } = null!;
 
+    public string? Description { get; set; }
+
     public virtual ICollection<RolesOfUser> RolesOfUsers { get; set; } = new List<RolesOfUser>();
 }
