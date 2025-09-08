@@ -16,6 +16,7 @@ namespace AccountingSystemService.DataCollections
 
             try
             {
+                errorHandler.HandleError("Начата загрузка данных о пользователях", Severity.Information);
                 using var db = DbContextHelper.GetConstructionContext();
                 var users = db.Users.ToList();
                 var rolesForUsers = db.RolesOfUsers.ToList().ToLookup(x=>x.UserId);
@@ -74,11 +75,11 @@ namespace AccountingSystemService.DataCollections
 
         private IErrorHandler ErrorHandler { get; }
 
-        public List<UserWrapper> Users { get; set; } = [];
+        private List<UserWrapper> Users { get; set; } = [];
 
-        public List<RoleWrapper> Roles { get; set; } = [];
+        private List<RoleWrapper> Roles { get; set; } = [];
 
-        public List<PermissionWrapper> Permissions { get; set; } = [];
+        private List<PermissionWrapper> Permissions { get; set; } = [];
 
         /// <summary>
         /// Метод для добавления пользователя, возвращает Id в базе нового пользователя, если добавление прошло херово то вернет -1
@@ -227,7 +228,7 @@ namespace AccountingSystemService.DataCollections
             int result = -1;
             try
             {
-                var db = DbContextHelper.GetConstructionContext();
+                using var db = DbContextHelper.GetConstructionContext();
                 var role = new Role();
                 role.Name = name;
                 role.Description = description;
@@ -259,13 +260,108 @@ namespace AccountingSystemService.DataCollections
 
             try
             {
+                using var db = DbContextHelper.GetConstructionContext();
+                var role = db.Roles.FirstOrDefault(x => x.Id == wrapper.Id);
+                var rWrapper = Roles.FirstOrDefault(x => x.Id == wrapper.Id);
+                var permsOfRoles = db.PermissionsForRoles.Where(x => x.RoleId == wrapper.Id).ToList();
+                if (role is not null && rWrapper is not null)
+                {
+                    role.Name = wrapper.Name;
+                    role.Description = wrapper.Description;
+                    db.SaveChanges();
 
+                    ErrorHandler.HandleError($"Обновлены основные данные роли {wrapper.Name} в базе",Severity.Information);
+
+                    rWrapper.Name = wrapper.Name;
+                    rWrapper.Description = wrapper.Description;
+                    rWrapper.Permissions = [];
+                    foreach (var permission in wrapper.Permissions)
+                    {
+                        rWrapper.Permissions.Add(permission);
+                    }
+
+                    ErrorHandler.HandleError($"Обновлены основные данные роли {wrapper.Name} в коллекции", Severity.Information);
+
+                    foreach(var perm in permsOfRoles)
+                    {
+                        db.PermissionsForRoles.Remove(perm);
+                    }
+
+                    db.SaveChanges();
+
+                    foreach(var perm in wrapper.Permissions)
+                    {
+                        var permForRole = new PermissionsForRole();
+                        permForRole.RoleId = wrapper.Id;
+                        permForRole.PermId = perm;
+                        db.PermissionsForRoles.Add(permForRole);
+                    }
+
+                    db.SaveChanges();
+
+                    ErrorHandler.HandleError($"Обновлены разрешения роли {wrapper.Name}", Severity.Information);
+
+                    return true;
+                }
             }
             catch (Exception e)
             {
                 ErrorHandler.HandleError($"Ошибка при обновлении роли {wrapper.Name} -> {e.Message}", Severity.Error);
             }
             return false;
+        }
+
+        public bool RemoveRole(int roleId, string roleName)
+        {
+
+            try
+            {
+                using var db = DbContextHelper.GetConstructionContext();
+
+                var role = db.Roles.FirstOrDefault(x => x.Id == roleId);
+                var rWrapper = Roles.FirstOrDefault(x => x.Id == roleId);
+                if(role is not null && rWrapper is not null)
+                {
+                    
+                    db.Roles.Remove(role);
+
+                    db.SaveChanges();
+
+                    Roles.Remove(rWrapper);
+
+                    foreach(var user in Users)
+                    {
+                        if (user.Roles.Contains(roleId))
+                        {
+                            user.Roles.Remove(roleId);
+                        }
+                    }
+
+                    ErrorHandler.HandleError($"Роль {roleName} удалена",Severity.Information);
+                }
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                ErrorHandler.HandleError($"Ошибка при удалении роли {roleName} -> {e.Message}",Severity.Error);
+            }
+            return false;
+        }
+
+        public List<ProtoUser> GetAllUsers()
+        {
+            return [..Users.Select(x=>x.ProtoObject)];
+        }
+
+        public List<ProtoRole> GetAllRoles()
+        {
+            return [.. Roles.Select(x => x.ProtoObject)];
+        }
+
+        public List<ProtoPermission> GetAllPermissions()
+        {
+            return [.. Permissions.Select(x => x.ProtoObject)];
         }
     }
 }
