@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+import "google/protobuf/empty.proto";
+
 option csharp_namespace = "AccountingSystemService";
 
 package mainService;
@@ -7,7 +9,94 @@ package mainService;
 
 service AccountingSystem {
   
-  
+	rpc GetItemsByObject(PInt) returns (List_Items);
+	rpc GetAllObjects(.google.protobuf.Empty) returns (List_Objects);
+	rpc GetAllGroupingProps(.google.protobuf.Empty) returns (List_GroupingProps);
+	rpc GetGroupingPropsByItem(PInt) returns (List_GroupingProps);
+	rpc GetAllTypesOfUnit(.google.protobuf.Empty) returns (List_TypesOfUnit);
+	rpc GetAllRoles(.google.protobuf.Empty) returns (List_Roles);
+	rpc GetAllUsers(.google.protobuf.Empty) returns (List_Users);
+	rpc GetAllNames(.google.protobuf.Empty) returns (List_NameItems);
+	rpc GetAllProducers(.google.protobuf.Empty) returns (List_Producers);
+	rpc GetMetaDataOfItem(PInt) returns (List_MetaData);
+	rpc GetJournal(.google.protobuf.Empty) returns (ProtoJournal);
+
+	rpc AddItem(ProtoItem) returns (PInt);
+	rpc UpdateItem(ProtoItem) returns (PBool);
+	rpc RemoveItem(ProtoItem) returns (PBool);
+
+	rpc AddObject(ProtoObject) returns (PInt);
+	rpc UpdateObject(ProtoObject) returns (PBool);
+	rpc RemoveObject(ProtoObject) returns (PBool);
+
+	rpc AddUser(ProtoUser) returns (PInt);
+	rpc UpdateUser(ProtoUser) returns (PBool);
+	rpc RemoveUser(ProtoUser) returns (PBool);
+
+	rpc AddRole(ProtoRole) returns (PInt);
+	rpc UpdateRole(ProtoRole) returns (PBool);
+	rpc RemoveRole(ProtoRole) returns (PBool);
+
+	rpc AddGroupingProperty(ProtoGroupingProperty) returns (PInt);
+	rpc AddProducer(ProtoProducer) returns (PInt);
+	rpc AddNameItem(ProtoNameItem) returns (PInt);
+	rpc AddTypeOfUnit(ProtoTypeOfUnit) returns (PInt);
+	rpc AddItemMetaData(ProtoItemMetaData) returns (PInt);
+	rpc AddRecordToJournal(ProtoJournalRecord) returns (PBool);
+
+	rpc AddGroupingPropertyOfItem(ChangeGroupingPropertyofItem) returns (PBool);
+	rpc RemoveGroupingPropertyOfItem(ChangeGroupingPropertyofItem) returns (PBool);
+
+	rpc RemoveItemMetaData(ProtoItemMetaData) returns (PBool);
+}
+
+message ChangeGroupingPropertyofItem{
+	ProtoGroupingProperty prop = 1;
+	int32 itemId = 2;
+}
+
+message PBool{
+	bool val = 1;
+}
+
+message PInt{
+	int32 val = 1;
+}
+
+message List_Items{
+	repeated ProtoItem items = 1;
+}
+
+message List_Objects{
+	repeated ProtoObject objs = 1;
+}
+
+message List_GroupingProps{
+	repeated ProtoGroupingProperty props = 1;
+}
+
+message List_TypesOfUnit{
+	repeated ProtoTypeOfUnit types = 1;
+}
+
+message List_Roles{
+	repeated ProtoRole roles = 1;
+}
+
+message List_Users{
+	repeated ProtoUser users = 1;
+}
+
+message List_NameItems{
+	repeated ProtoNameItem names = 1;
+}
+
+message List_Producers{
+	repeated ProtoProducer producers = 1;
+}
+
+message List_MetaData{
+	repeated ProtoItemMetaData metadata = 1;
 }
 
 message ProtoUser{

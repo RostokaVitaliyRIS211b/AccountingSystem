@@ -15,11 +15,20 @@ namespace AccountingSystemService.Helpers
             using JsonDocument doc = JsonDocument.Parse(json);
             Connection = doc.RootElement.GetProperty("ConnectionStrings").GetProperty("DatabaseConnection").GetString();
         }
+
+        public static void ProcessOptionsBuilder(DbContextOptionsBuilder builder)
+        {
+            builder.UseNpgsql(Connection);
+        }
+
         public static ConstructionContext GetConstructionContext()
         {
-            var  optionsBuilder = new DbContextOptionsBuilder<ConstructionContext>();
-            var options = optionsBuilder.UseNpgsql(Connection).Options;
+            var optionsBuilder = new DbContextOptionsBuilder<ConstructionContext>();
+            ProcessOptionsBuilder(optionsBuilder);
+            var options = optionsBuilder.Options;
             return new(options);
         }
+
+
     }
 }

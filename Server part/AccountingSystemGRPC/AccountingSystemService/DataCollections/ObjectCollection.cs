@@ -311,7 +311,7 @@ namespace AccountingSystemService.DataCollections
             return result;
         }
 
-        public List<ProtoGroupingProperty> GetPropertiesOfItem(int itemId, string name)
+        public List<ProtoGroupingProperty> GetPropertiesOfItem(int itemId)
         {
             var res = new List<ProtoGroupingProperty>();
 
@@ -327,7 +327,7 @@ namespace AccountingSystemService.DataCollections
             }
             catch (Exception e)
             {
-                ErrorHandler.HandleError($"Ошибка при получении свойств группировки объекта {name} -> {e.Message}", Severity.Error);
+                ErrorHandler.HandleError($"Ошибка при получении свойств группировки записи {itemId} -> {e.Message}", Severity.Error);
             }
             return res;
         }
@@ -561,6 +561,75 @@ namespace AccountingSystemService.DataCollections
             return [.. Items.Where(x => x.Obj?.Id == objectId).Select(x => x.ProtoObject)];
         }
 
+        public List<ProtoItemMetaData> GetItemMetaData(int itemId)
+        {
+            var result = new List<ProtoItemMetaData>();
+            try
+            {
 
+                using var db = DbContextHelper.GetConstructionContext();
+
+                var data = db.ItemMetaData.Where(x => x.ItemId == itemId).ToList();
+
+                foreach ( var item in data)
+                {
+                    var mWrapper = new MetaDataWrapper();
+                    mWrapper.Id = item.Id;
+                    mWrapper.Name = item.Name ?? "";
+                    mWrapper.Data = item.Data;
+                    mWrapper.TypeId = item.DataTypeId;
+                    mWrapper.ItemId = itemId;
+
+                    result.Add(mWrapper.ProtoObject);
+                }
+            }
+            catch (Exception e)
+            {
+                ErrorHandler.HandleError($"Ошибка при получении метаданных о записи {itemId} -> {e.Message}", Severity.Error);
+            }
+            return result;
+        }
+
+        public bool AddGroupingPropertyToItem(GroupingPropertyWrapper wrapper, int itemId)
+        {
+
+            try
+            {
+                using var db = DbContextHelper.GetConstructionContext();
+                var propToItem = new GroupingPropertiesForItem();
+                propToItem.PropId = wrapper.Id;
+                propToItem.ItemId = itemId;
+                db.GroupingPropertiesForItems.Add(propToItem);
+                db.SaveChanges();
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                ErrorHandler.HandleError($"Ошибка при добавлении свойства группировки {wrapper.Name} записи {itemId} -> {e.Message}", Severity.Error);
+            }
+            return false;
+        }
+
+        public bool RemoveGroupingPropertyOfItem(GroupingPropertyWrapper wrapper, int itemId)
+        {
+
+            try
+            {
+                using var db = DbContextHelper.GetConstructionContext();
+                var propToItem = db.GroupingPropertiesForItems.FirstOrDefault(x => x.PropId == wrapper.Id && itemId == x.ItemId);
+                if (propToItem != null)
+                {
+                    db.GroupingPropertiesForItems.Remove(propToItem);
+                    db.SaveChanges();
+                    return true;
+                }
+            }
+            catch (Exception e)
+            {
+                ErrorHandler.HandleError($"Ошибка при удалении свойства группировки {wrapper.Name} записи {itemId} -> {e.Message}", Severity.Error);
+            }
+            return false;
+        }
     }
 }

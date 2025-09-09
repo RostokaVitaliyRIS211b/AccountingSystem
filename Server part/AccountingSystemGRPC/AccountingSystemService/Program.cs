@@ -1,4 +1,5 @@
 using AccountingSystemService;
+using AccountingSystemService.DataCollections;
 using AccountingSystemService.Helpers;
 using AccountingSystemService.Interfaces;
 using AccountingSystemService.Middleware;
@@ -9,6 +10,7 @@ using AccountingSystemService.Validators;
 using BdClasses;
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 using NLog;
@@ -29,9 +31,14 @@ builder.Services.AddGrpc(options =>
 
 builder.Services.AddSingleton(provider => new CustomTokenValidator(AuthServiceHelper.JwtKey));
 
-builder.Services.AddDbContext<ConstructionContext>();
 
-builder.Services.AddTransient<IErrorHandler>(x=> new ErrorHandlerA());
+builder.Services.AddDbContext<ConstructionContext>(DbContextHelper.ProcessOptionsBuilder);
+
+builder.Services.AddTransient<IErrorHandler>(x => new ErrorHandlerA());
+
+builder.Services.AddSingleton<UsersCollection>();
+
+builder.Services.AddSingleton<ObjectCollection>();
 
 var validationParameters = new TokenValidationParameters()
 {
