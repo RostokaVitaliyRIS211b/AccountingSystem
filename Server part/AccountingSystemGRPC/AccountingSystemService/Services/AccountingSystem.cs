@@ -27,6 +27,7 @@ namespace AccountingSystemService.Services
             this.db = db;
         }
 
+        [Authorize(Roles = "27")]
         public override Task<PInt> AddGroupingProperty(ProtoGroupingProperty request, ServerCallContext context)
         {
             PInt result = new() { Val = -1 };
@@ -42,6 +43,7 @@ namespace AccountingSystemService.Services
             return Task.FromResult(result);
         }
 
+        [Authorize(Roles = "15")]
         public override Task<PBool> AddGroupingPropertyOfItem(ChangeGroupingPropertyofItem request, ServerCallContext context)
         {
             PBool result = new() { Val = false };
@@ -57,6 +59,7 @@ namespace AccountingSystemService.Services
             return Task.FromResult(result);
         }
 
+        [Authorize(Roles = "13")]
         public override Task<PInt> AddItem(ProtoItem request, ServerCallContext context)
         {
             PInt result = new() { Val = -1 };
@@ -72,6 +75,7 @@ namespace AccountingSystemService.Services
             return Task.FromResult(result);
         }
 
+        [Authorize(Roles = "25")]
         public override Task<PInt> AddItemMetaData(ProtoItemMetaData request, ServerCallContext context)
         {
             PInt ret = new() { Val = -1 };
@@ -97,6 +101,7 @@ namespace AccountingSystemService.Services
             return Task.FromResult(ret);
         }
 
+        [Authorize(Roles = "29")]
         public override Task<PInt> AddNameItem(ProtoNameItem request, ServerCallContext context)
         {
             PInt result = new() { Val = -1 };
@@ -112,6 +117,7 @@ namespace AccountingSystemService.Services
             return Task.FromResult(result);
         }
 
+        [Authorize(Roles = "9")]
         public override Task<PInt> AddObject(ProtoObject request, ServerCallContext context)
         {
             PInt result = new() { Val = -1 };
@@ -127,6 +133,7 @@ namespace AccountingSystemService.Services
             return Task.FromResult(result);
         }
 
+        [Authorize(Roles = "31")]
         public override Task<PInt> AddProducer(ProtoProducer request, ServerCallContext context)
         {
             PInt result = new() { Val = -1 };
@@ -142,6 +149,7 @@ namespace AccountingSystemService.Services
             return Task.FromResult(result);
         }
 
+        [Authorize(Roles = "16")]
         public override Task<PBool> AddRecordToJournal(ProtoJournalRecord request, ServerCallContext context)
         {
             PBool result = new() { Val = false };
@@ -164,6 +172,7 @@ namespace AccountingSystemService.Services
             return Task.FromResult(result);
         }
 
+        [Authorize(Roles = "4")]
         public override Task<PInt> AddRole(ProtoRole request, ServerCallContext context)
         {
             PInt result = new() { Val = -1 };
@@ -179,6 +188,7 @@ namespace AccountingSystemService.Services
             return Task.FromResult(result);
         }
 
+        [Authorize(Roles = "33")]
         public override Task<PInt> AddTypeOfUnit(ProtoTypeOfUnit request, ServerCallContext context)
         {
             PInt result = new() { Val = -1 };
@@ -194,6 +204,7 @@ namespace AccountingSystemService.Services
             return Task.FromResult(result);
         }
 
+        [Authorize(Roles = "1")]
         public override Task<PInt> AddUser(ProtoUser request, ServerCallContext context)
         {
             PInt result = new() { Val = -1 };
@@ -209,6 +220,7 @@ namespace AccountingSystemService.Services
             return Task.FromResult(result);
         }
 
+        [Authorize(Roles = "26")]
         public override Task<List_GroupingProps> GetAllGroupingProps(Empty request, ServerCallContext context)
         {
             List_GroupingProps list = new();
@@ -227,6 +239,7 @@ namespace AccountingSystemService.Services
             return Task.FromResult(list);
         }
 
+        [Authorize(Roles = "28")]
         public override Task<List_NameItems> GetAllNames(Empty request, ServerCallContext context)
         {
             List_NameItems list = new();
@@ -245,6 +258,7 @@ namespace AccountingSystemService.Services
             return Task.FromResult(list);
         }
 
+        [Authorize(Roles = "23")]
         public override Task<List_Objects> GetAllObjects(Empty request, ServerCallContext context)
         {
             List_Objects list = new();
@@ -263,6 +277,7 @@ namespace AccountingSystemService.Services
             return Task.FromResult(list);
         }
 
+        [Authorize(Roles = "30")]
         public override Task<List_Producers> GetAllProducers(Empty request, ServerCallContext context)
         {
             List_Producers list = new();
@@ -281,6 +296,7 @@ namespace AccountingSystemService.Services
             return Task.FromResult(list);
         }
 
+        [Authorize(Roles = "21")]
         public override Task<List_Roles> GetAllRoles(Empty request, ServerCallContext context)
         {
             List_Roles list = new();
@@ -299,6 +315,7 @@ namespace AccountingSystemService.Services
             return Task.FromResult(list);
         }
 
+        [Authorize(Roles = "32")]
         public override Task<List_TypesOfUnit> GetAllTypesOfUnit(Empty request, ServerCallContext context)
         {
             List_TypesOfUnit list = new();
@@ -317,6 +334,7 @@ namespace AccountingSystemService.Services
             return Task.FromResult(list);
         }
 
+        [Authorize(Roles = "20")]
         public override Task<List_Users> GetAllUsers(Empty request, ServerCallContext context)
         {
             List_Users list = new();
@@ -335,6 +353,7 @@ namespace AccountingSystemService.Services
             return Task.FromResult(list);
         }
 
+        [Authorize(Roles = "20")]
         public override Task<List_GroupingProps> GetGroupingPropsByItem(PInt request, ServerCallContext context)
         {
             List_GroupingProps list = new();
@@ -353,6 +372,7 @@ namespace AccountingSystemService.Services
             return Task.FromResult(list);
         }
 
+        [Authorize(Roles = "19")]
         public override Task<List_Items> GetItemsByObject(PInt request, ServerCallContext context)
         {
             List_Items list = new();
@@ -371,6 +391,7 @@ namespace AccountingSystemService.Services
             return Task.FromResult(list);
         }
 
+        [Authorize(Roles = "22")]
         public override Task<ProtoJournal> GetJournal(Empty request, ServerCallContext context)
         {
             ProtoJournal jour = new();
@@ -393,6 +414,7 @@ namespace AccountingSystemService.Services
             return Task.FromResult(jour);
         }
 
+        [Authorize(Roles = "24")]
         public override Task<List_MetaData> GetMetaDataOfItem(PInt request, ServerCallContext context)
         {
             List_MetaData list = new();
@@ -411,6 +433,7 @@ namespace AccountingSystemService.Services
             return Task.FromResult(list);
         }
 
+        [Authorize(Roles = "15")]
         public override Task<PBool> RemoveGroupingPropertyOfItem(ChangeGroupingPropertyofItem request, ServerCallContext context)
         {
             PBool result = new() { Val = false };
@@ -426,6 +449,7 @@ namespace AccountingSystemService.Services
             return Task.FromResult(result);
         }
 
+        [Authorize(Roles = "14")]
         public override Task<PBool> RemoveItem(ProtoItem request, ServerCallContext context)
         {
             PBool result = new() { Val = false };
@@ -441,6 +465,7 @@ namespace AccountingSystemService.Services
             return Task.FromResult(result);
         }
 
+        [Authorize(Roles = "25")]
         public override Task<PBool> RemoveItemMetaData(ProtoItemMetaData request, ServerCallContext context)
         {
             PBool result = new() { Val = false };
@@ -462,6 +487,7 @@ namespace AccountingSystemService.Services
             return Task.FromResult(result);
         }
 
+        [Authorize(Roles = "10")]
         public override Task<PBool> RemoveObject(ProtoObject request, ServerCallContext context)
         {
             PBool result = new() { Val = false };
@@ -477,6 +503,7 @@ namespace AccountingSystemService.Services
             return Task.FromResult(result);
         }
 
+        [Authorize(Roles = "5")]
         public override Task<PBool> RemoveRole(ProtoRole request, ServerCallContext context)
         {
             PBool result = new() { Val = false };
@@ -492,6 +519,7 @@ namespace AccountingSystemService.Services
             return Task.FromResult(result);
         }
 
+        [Authorize(Roles = "2")]
         public override Task<PBool> RemoveUser(ProtoUser request, ServerCallContext context)
         {
             PBool result = new() { Val = false };
@@ -507,6 +535,7 @@ namespace AccountingSystemService.Services
             return Task.FromResult(result);
         }
 
+        [Authorize(Roles = "15")]
         public override Task<PBool> UpdateItem(ProtoItem request, ServerCallContext context)
         {
             PBool result = new() { Val = false };
@@ -522,6 +551,7 @@ namespace AccountingSystemService.Services
             return Task.FromResult(result);
         }
 
+        [Authorize(Roles = "11")]
         public override Task<PBool> UpdateObject(ProtoObject request, ServerCallContext context)
         {
             PBool result = new() { Val = false };
@@ -537,6 +567,7 @@ namespace AccountingSystemService.Services
             return Task.FromResult(result);
         }
 
+        [Authorize(Roles = "6")]
         public override Task<PBool> UpdateRole(ProtoRole request, ServerCallContext context)
         {
             PBool result = new() { Val = false };
@@ -552,6 +583,7 @@ namespace AccountingSystemService.Services
             return Task.FromResult(result);
         }
 
+        [Authorize(Roles = "3")]
         public override Task<PBool> UpdateUser(ProtoUser request, ServerCallContext context)
         {
             PBool result = new() { Val = false };

@@ -31,8 +31,7 @@ namespace AccountingSystemService.Services
                 if (user is not null && request.Password == user.Password)
                 {
                     var rolesOfUser = db.RolesOfUsers.Where(x => x.UserId == user.Id).Select(x => x.RoleId).ToList();
-                    var roles = db.Roles.Where(x => rolesOfUser.Contains(x.Id)).Select(x => x.Id).ToList();
-                    var permissions = db.PermissionsForRoles.Where(x => roles.Contains(x.RoleId)).Select(x=>x.PermId).ToList();
+                    var permissions = db.PermissionsForRoles.Where(x => rolesOfUser.Contains(x.RoleId)).Select(x=>x.PermId).ToList();
                     var claims = new List<Claim>
                     {
                         new (ClaimTypes.Name,request.Username),
