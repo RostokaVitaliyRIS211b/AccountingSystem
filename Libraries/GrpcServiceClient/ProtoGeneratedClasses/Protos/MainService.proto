@@ -9,6 +9,7 @@ package mainService;
 
 service AccountingSystem {
   
+	rpc GetAllPermissions(.google.protobuf.Empty) returns (List_Permissions);
 	rpc GetItemsByObject(PInt) returns (List_Items);
 	rpc GetAllObjects(.google.protobuf.Empty) returns (List_Objects);
 	rpc GetAllGroupingProps(.google.protobuf.Empty) returns (List_GroupingProps);
@@ -97,6 +98,10 @@ message List_Producers{
 
 message List_MetaData{
 	repeated ProtoItemMetaData metadata = 1;
+}
+
+message List_Permissions{
+	repeated ProtoPermission permissions = 1;
 }
 
 message ProtoUser{

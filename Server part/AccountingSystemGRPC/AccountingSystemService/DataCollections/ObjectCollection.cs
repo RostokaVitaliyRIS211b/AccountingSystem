@@ -30,7 +30,7 @@ namespace AccountingSystemService.DataCollections
                 var items = db.Items.ToList();
 
 
-                ErrorHandler.HandleError($"Основные данные загружены из базы", Severity.Error);
+                ErrorHandler.HandleError($"Основные данные загружены из базы", Severity.Information);
 
                 foreach (var item in objects)
                 {

@@ -1,0 +1,35 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="250"
+			 xmlns:vm="clr-namespace:ObjectsManager.ViewModels"
+             x:Class="ObjectsManager.Views.AuthorizationView"
+			 x:DataType="vm:AuthorizationViewModel">
+	<Grid RowDefinitions="*,auto">
+		<Grid Grid.Row="0" RowDefinitions="auto,*">
+			<StackPanel Margin="20,20,0,0" Orientation="Horizontal">
+				<TextBlock VerticalAlignment="Center" Text="IP Адрес:"/>
+				<TextBox Margin="10,0,30,0" Width="150" VerticalAlignment="Center" Text="{Binding Name}"/>
+				<TextBlock VerticalAlignment="Center" Text="Порт:"/>
+				<TextBox Margin="10" Width="150" VerticalAlignment="Center" Text="{Binding Password}" FontSize="10" PasswordChar="●"/>
+			</StackPanel>
+			<StackPanel Grid.Row="1" Margin="20,10,0,0" Orientation="Vertical">
+				<StackPanel Orientation="Horizontal">
+					<TextBlock VerticalAlignment="Center" Text="Пользователь:"/>
+					<TextBox Margin="10,0,0,0" Width="343" VerticalAlignment="Center" Text="{Binding IpAddress}"/>
+				</StackPanel>
+				<StackPanel Margin="0,20,0,0" Orientation="Horizontal">
+					<TextBlock VerticalAlignment="Center"  Text="Пароль:"/>
+					<TextBox Margin="55,0,0,0" Width="343" VerticalAlignment="Center" Text="{Binding IpAddress}"/>
+				</StackPanel>
+			</StackPanel>
+		</Grid>
+		<Border Grid.Row="1" Background="{DynamicResource LightGrayBrush}" Height="50" HorizontalAlignment="Stretch">
+			<StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+				<Button Content="Войти" Command="{Binding AuthorizeCommand}"/>
+				<Button Margin="10,0" Content="Отмена" Click="Button_Cancel_Click"/>
+			</StackPanel>
+		</Border>
+	</Grid>
+</UserControl>

@@ -12,6 +12,18 @@ namespace GrpcServiceClient
     {
         // === GETTERS ===
 
+        public List<Permission> GetAllPermissions()
+        {
+            var reply = Client.GetAllPermissions(new Google.Protobuf.WellKnownTypes.Empty());
+            return [.. reply.Permissions.Select(x => new Permission(x))];
+        }
+
+        public async Task<List<Permission>> GetAllPermissionsAsync()
+        {
+            var reply = await Client.GetAllPermissionsAsync(new Google.Protobuf.WellKnownTypes.Empty());
+            return [.. reply.Permissions.Select(x => new Permission(x))];
+        }
+
         public List<Item> GetItemsByObject(int objectId)
         {
             var reply = Client.GetItemsByObject(new PInt() { Val = objectId });

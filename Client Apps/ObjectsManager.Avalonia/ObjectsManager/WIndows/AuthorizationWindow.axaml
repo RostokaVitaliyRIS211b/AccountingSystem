@@ -1,0 +1,13 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="250"
+        x:Class="ObjectsManager.Windows.AuthorizationWindow"
+		xmlns:views="clr-namespace:ObjectsManager.Views"
+		Icon="/Assets/ColorIcons/icons8-home-50.png"
+        Title="Авторизация"
+		Height="250"
+		Width="500">
+<views:AuthorizationView/>
+</Window>

@@ -599,5 +599,23 @@ namespace AccountingSystemService.Services
             }
             return Task.FromResult(result);
         }
+
+        [Authorize(Roles = "35")]
+        public override Task<List_Permissions> GetAllPermissions(Empty request, ServerCallContext context)
+        {
+            var res = new List_Permissions();
+            try
+            {
+                foreach (var item in usrColl.GetAllPermissions())
+                {
+                    res.Permissions.Add(item);
+                }
+            }
+            catch (Exception e)
+            {
+                ErrorHandler.HandleError($"Ошибка при получении списка разрешений -> {e.Message}", Severity.Error);
+            }
+            return Task.FromResult(res);
+        }
     }
 }
