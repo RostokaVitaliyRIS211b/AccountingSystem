@@ -34,6 +34,7 @@ public partial class AuthorizationView : UserControl
             {
                 Application.Current.Resources["LightGrayBrush"] = new SolidColorBrush(Colors.Gray);
                 Application.Current.Resources["WhiteSmokeBrush"] = new SolidColorBrush(Colors.DimGray);
+                Application.Current.Resources["WhiteBrush"] = new SolidColorBrush(Colors.Black);
                 Application.Current.Resources["RedBrush"] = new SolidColorBrush(Colors.Gold);
                 Application.Current.Resources["BlueBrush"] = new SolidColorBrush(Colors.LightSkyBlue);
                 Application.Current.Resources["AliceBlueBrush"] = new SolidColorBrush(Colors.SteelBlue);

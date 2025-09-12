@@ -4,9 +4,71 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:ObjectsManager.ViewModels"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="ObjectsManager.Views.MainView">
-  <Design.DataContext>
-    <vm:MainViewModel />
-  </Design.DataContext>
- 
+             x:Class="ObjectsManager.Views.MainView"
+	         x:DataType="vm:MainViewModel"
+			 xmlns:gb="using:GroupBox.Avalonia.Controls">
+	<Grid  RowDefinitions="auto,*,auto">
+		<Menu x:Name="MainMenu" Background="{DynamicResource LightGrayBrush}">
+			<MenuItem Header="Справочники">
+				
+				<MenuItem Header="Роли" Command="{Binding OpenRoleWindowCommand}">
+					<MenuItem.Icon>
+						<Image Source="/Assets/ColorIcons/icons8-user-50.png"/>
+					</MenuItem.Icon>
+				</MenuItem>
+				
+				<MenuItem Header="Пользователи">
+					<MenuItem.Icon>
+						<Image Source="/Assets/ColorIcons/icons8-male-user-50.png"/>
+					</MenuItem.Icon>
+				</MenuItem>
+				
+				<MenuItem Header="Объекты">
+					<MenuItem.Icon>
+						<Image Source="/Assets/ColorIcons/icons8-home-50.png"/>
+					</MenuItem.Icon>
+				</MenuItem>
+			</MenuItem>
+			
+			<MenuItem Header="Тема">
+				<MenuItem Header="Светлая"/>
+				<MenuItem Header="Темная"/>
+			</MenuItem>
+			
+		</Menu>
+		
+		<Grid Grid.Row="1" ColumnDefinitions="300,auto,*">
+			<gb:GroupBox>
+				<gb:GroupBox.Header>
+					<Border x:Name="objBorder" Background="{ DynamicResource WhiteSmokeBrush }" Height="50" CornerRadius="3">
+						<TextBlock TextWrapping="Wrap" Text="Объекты" Margin="10,0,0,0" VerticalAlignment="Center" />
+					</Border>
+				</gb:GroupBox.Header>
+				<Grid RowDefinitions="40,*">
+					<Grid Grid.Row="0" ColumnDefinitions="auto,*">
+						<Image ToolTip.Tip="Фильтр по имени объекта" Width="30" Source="/Assets/ColorIcons/icons8-search-100.png"/>
+						<TextBox Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="10,0,0,0" ToolTip.Tip="Фильтр по имени объекта"/>
+					</Grid>
+					<ListBox Background="{DynamicResource WhiteBrush}" Grid.Row="1" ItemsSource="{Binding ConObjects}" SelectedItem="{Binding SelectedObj}">
+						
+					</ListBox>
+				</Grid>
+			</gb:GroupBox>
+			
+			<GridSplitter  Background="{DynamicResource LightGrayBrush }" Grid.Column="1" Width="3"/>
+			
+			<gb:GroupBox Grid.Column="2">
+				<gb:GroupBox.Header>
+					<Border Background="{ DynamicResource WhiteSmokeBrush }" Height="50" CornerRadius="3">
+						<StackPanel Orientation="Horizontal">
+							<TextBlock TextWrapping="Wrap" Text="План объекта:" Margin="10,0,0,0" VerticalAlignment="Center" />
+						</StackPanel>
+					</Border>
+				</gb:GroupBox.Header>
+			</gb:GroupBox>
+		</Grid>
+		
+		<TextBlock Grid.Row="2" Height="{Binding Height,ElementName=MainMenu}"  Background="{DynamicResource LightGrayBrush }"/>
+	</Grid>
+	
 </UserControl>

@@ -441,6 +441,18 @@ namespace GrpcServiceClient
             var reply = await Client.RemoveItemMetaDataAsync(metaData.ProtoObject);
             return reply.Val;
         }
+
+        // === OTHER ===
+
+        public void CheckActive()
+        {
+            Client.CheckActive(new Google.Protobuf.WellKnownTypes.Empty());
+        }
+
+        public async Task CheckActiveAsync()
+        {
+            await Client.CheckActiveAsync(new Google.Protobuf.WellKnownTypes.Empty());
+        }
     }
 }
 

@@ -617,5 +617,10 @@ namespace AccountingSystemService.Services
             }
             return Task.FromResult(res);
         }
+
+        public override Task<Empty> CheckActive(Empty request, ServerCallContext context)
+        {
+            return Task.FromResult(new Empty());
+        }
     }
 }

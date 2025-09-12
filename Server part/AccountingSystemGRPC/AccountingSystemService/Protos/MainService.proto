@@ -50,6 +50,8 @@ service AccountingSystem {
 
 	rpc RemoveItemMetaData(ProtoItemMetaData) returns (PBool);
 
+	rpc CheckActive(.google.protobuf.Empty) returns (.google.protobuf.Empty);
+
 }
 
 message ChangeGroupingPropertyofItem{

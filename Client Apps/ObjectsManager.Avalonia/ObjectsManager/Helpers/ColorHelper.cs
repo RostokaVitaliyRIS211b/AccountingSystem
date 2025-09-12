@@ -20,6 +20,7 @@ namespace ObjectsManager.Helpers
                 {
                     Application.Current.Resources["LightGrayBrush"] = new SolidColorBrush(Colors.Gray);
                     Application.Current.Resources["WhiteSmokeBrush"] = new SolidColorBrush(Colors.DimGray);
+                    Application.Current.Resources["WhiteBrush"] = new SolidColorBrush(Colors.Black);
                     Application.Current.Resources["RedBrush"] = new SolidColorBrush(Colors.Gold);
                     Application.Current.Resources["BlueBrush"] = new SolidColorBrush(Colors.LightSkyBlue);
                     Application.Current.Resources["AliceBlueBrush"] = new SolidColorBrush(Colors.SteelBlue);
@@ -31,6 +32,7 @@ namespace ObjectsManager.Helpers
                     Application.Current.Resources["RedBrush"] = new SolidColorBrush(Colors.Red);
                     Application.Current.Resources["BlueBrush"] = new SolidColorBrush(Colors.Blue);
                     Application.Current.Resources["AliceBlueBrush"] = new SolidColorBrush(Colors.AliceBlue);
+                    Application.Current.Resources["WhiteBrush"] = new SolidColorBrush(Colors.White);
                 }
             }
         }

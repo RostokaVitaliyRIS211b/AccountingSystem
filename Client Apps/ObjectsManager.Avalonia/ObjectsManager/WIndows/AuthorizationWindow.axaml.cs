@@ -12,5 +12,6 @@ public partial class AuthorizationWindow : Window
     {
         InitializeComponent();
         DataContext = viewModel;
+        viewModel.Win = this;
     }
 }

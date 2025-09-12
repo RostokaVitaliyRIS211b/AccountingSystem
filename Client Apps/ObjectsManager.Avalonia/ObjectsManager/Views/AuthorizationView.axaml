@@ -10,18 +10,18 @@
 		<Grid Grid.Row="0" RowDefinitions="auto,*">
 			<StackPanel Margin="20,20,0,0" Orientation="Horizontal">
 				<TextBlock VerticalAlignment="Center" Text="IP Адрес:"/>
-				<TextBox Margin="10,0,30,0" Width="150" VerticalAlignment="Center" Text="{Binding Name}"/>
+				<TextBox Margin="10,0,30,0" Width="150" VerticalAlignment="Center" Text="{Binding IpAddress}"/>
 				<TextBlock VerticalAlignment="Center" Text="Порт:"/>
-				<TextBox Margin="10" Width="150" VerticalAlignment="Center" Text="{Binding Password}" FontSize="10" PasswordChar="●"/>
+				<TextBox Margin="10" Width="150" VerticalAlignment="Center" Text="{Binding Port}" />
 			</StackPanel>
 			<StackPanel Grid.Row="1" Margin="20,10,0,0" Orientation="Vertical">
 				<StackPanel Orientation="Horizontal">
 					<TextBlock VerticalAlignment="Center" Text="Пользователь:"/>
-					<TextBox Margin="10,0,0,0" Width="343" VerticalAlignment="Center" Text="{Binding IpAddress}"/>
+					<TextBox Margin="10,0,0,0" Width="343" VerticalAlignment="Center" Text="{Binding Name}"/>
 				</StackPanel>
 				<StackPanel Margin="0,20,0,0" Orientation="Horizontal">
 					<TextBlock VerticalAlignment="Center"  Text="Пароль:"/>
-					<TextBox Margin="55,0,0,0" Width="343" VerticalAlignment="Center" Text="{Binding IpAddress}"/>
+					<TextBox Margin="55,0,0,0" Width="343" FontSize="10" PasswordChar="●" VerticalAlignment="Center" Text="{Binding Password}"/>
 				</StackPanel>
 			</StackPanel>
 		</Grid>
