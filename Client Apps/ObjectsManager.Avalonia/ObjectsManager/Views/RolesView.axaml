@@ -1,0 +1,71 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="500"
+			 xmlns:vm="clr-namespace:ObjectsManager.ViewModels"
+			 xmlns:gb="using:GroupBox.Avalonia.Controls"
+             x:Class="ObjectsManager.Views.RolesView"
+			 x:DataType="vm:RolesViewModel">
+	
+	<Grid ColumnDefinitions="*,auto,*">
+
+		<gb:GroupBox Grid.Column="0">
+			
+			<gb:GroupBox.Header>
+				<Border Background="{ DynamicResource LightGrayBrush }" Height="50" CornerRadius="3">
+					<TextBlock TextWrapping="Wrap" FontWeight="Bold" FontSize="30" Text="Роли" Margin="10,0,0,0" VerticalAlignment="Center" />
+				</Border>
+			</gb:GroupBox.Header>
+			
+			<Grid RowDefinitions="*,auto">
+
+				<ListBox Grid.Row="0" ItemsSource="{Binding RolesCollection}" SelectedItem="{Binding SelectedRole}" Background ="{DynamicResource WhiteBrush}">
+					<ListBox.ItemTemplate>
+						<DataTemplate>
+							<StackPanel Orientation="Horizontal">
+								<Image Width="25" Source="/Assets/ColorIcons/icons8-user-100.png"/>
+								<TextBlock Text="{Binding Name}" FontWeight="Bold" Margin="5,0,10,0" VerticalAlignment="Center"/>
+							</StackPanel>
+						</DataTemplate>
+					</ListBox.ItemTemplate>
+				</ListBox>
+
+				<Border Height="2" Background="LightGray" Grid.Row="1" VerticalAlignment="Top"/>
+				<StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
+					<Button Grid.Row="1" Command="{Binding AddRolesCommand}" FontSize="20" HorizontalAlignment="Right" Margin="10,10,10,10" Content="Добавить"/>
+					<Button Grid.Row="1" Command="{Binding DelRolesCommand}" FontSize="20" HorizontalAlignment="Right" Margin="10,10,10,10" Content="Удалить"/>
+				</StackPanel>
+
+			</Grid>
+		</gb:GroupBox>		
+		
+		
+		<GridSplitter  Background="{DynamicResource LightGrayBrush }" Grid.Column="1" Width="3"/>
+
+
+		<gb:GroupBox Grid.Column="2">
+			<gb:GroupBox.Header>
+				<Border Background="{ DynamicResource LightGrayBrush }" Height="50" CornerRadius="3">
+					<TextBlock TextWrapping="Wrap" FontWeight="Bold" FontSize="30" Text="Настройки" Margin="10,0,0,0" VerticalAlignment="Center" />
+				</Border>
+			</gb:GroupBox.Header>
+
+			<Grid RowDefinitions="*,auto">
+				
+				<StackPanel Grid.Row="0">
+					<TextBlock FontSize="20" Margin="10,10,0,0" Text="Роль:"/>
+					<TextBox TextChanged="OnTextChanged" Margin="10,10,10,10" Text="{Binding SelectedRole.Name}"/>
+					<TextBlock FontSize="20" Margin="10,0,0,0" Text="Дополнительно:"/>
+					<TextBox TextChanged="OnTextChanged" Text="{Binding SelectedRole.Description}" Height="240" Margin="10,10,10,10" TextWrapping="Wrap"/>
+				</StackPanel>
+				
+				<Border Height="2" Background ="{DynamicResource LightGrayBrush}" Grid.Row="1" VerticalAlignment="Top"/>
+				<Button Grid.Row="1" Command="{Binding SetPermissionsCommand}" FontSize="20" VerticalAlignment="Center" Margin="10,10,0,10" Content="Настроить разрешения ролей"/>
+			
+			</Grid>
+			
+		</gb:GroupBox>
+		
+	</Grid>
+</UserControl>

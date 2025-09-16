@@ -19,6 +19,7 @@ namespace ObjectsManager.Interfaces
 
 		public string Port { get; set; }
 
+
 		public Window? Win { get; set; }
 		public abstract Task Authorize();
 	}

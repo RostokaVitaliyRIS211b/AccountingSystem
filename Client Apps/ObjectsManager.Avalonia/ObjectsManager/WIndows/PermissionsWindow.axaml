@@ -1,0 +1,13 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="ObjectsManager.Windows.PermissionsWindow"
+		xmlns:views="clr-namespace:ObjectsManager.Views"
+		Icon="/Assets/ColorIcons/icons8-home-50.png"
+        Title="Разрешения"
+		Width="800"
+		Height="450">
+	<views:PermissionsView/>
+</Window>

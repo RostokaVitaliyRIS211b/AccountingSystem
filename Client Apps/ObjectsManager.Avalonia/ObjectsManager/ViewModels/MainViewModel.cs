@@ -1,4 +1,6 @@
-﻿using Avalonia.Controls;
+﻿using Avalonia;
+using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Controls;
 using Avalonia.Styling;
 
 using CommunityToolkit.Mvvm.Input;
@@ -124,10 +126,10 @@ public partial class MainViewModel : ViewModelBase, IMainViewModel
     [RelayCommand]
     public async Task OpenRoleWindow()
     {
-
         try
         {
-
+            var rolesWindow = new RolesWindow(new RolesViewModel(Service));
+            rolesWindow.Show();
         }
         catch (Exception e)
         {
