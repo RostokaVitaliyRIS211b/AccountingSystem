@@ -1,0 +1,43 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="ObjectsManager.Views.PermissionsView"
+			 xmlns:vm="clr-namespace:ObjectsManager.ViewModels"
+			 xmlns:gb="using:GroupBox.Avalonia.Controls"
+			 x:DataType="vm:PermissionsViewModel">
+
+	<Grid RowDefinitions="auto,*,auto">
+
+		<StackPanel Background="{ DynamicResource LightGrayBrush }" Grid.Row="0" Orientation="Horizontal">
+			<Button Click="Button_Click_Add" Background="Transparent" ToolTip.Tip="Применить все разрешения">
+				<Image Width="25" Source="/Assets/ColorIcons/icons8-check-mark-100.png"/>
+			</Button>
+			<Button Click="Button_Click_Del" Background="Transparent" ToolTip.Tip="Убрать все разрешения">
+				<Image Width="25" Source="/Assets/ColorIcons/icons8-cancel-100.png"/>
+			</Button>
+			<Button Background="Transparent">
+				<Image Width="25" Source="/Assets/ColorIcons/icons8-info-50.png"/>
+			</Button>
+		</StackPanel>
+
+
+		<DataGrid x:Name="grid" Grid.Row="1" ItemsSource="{Binding PermissionsCollection}">
+			<DataGrid.Columns>
+				<DataGridTextColumn Width="*" Header="Разрешения" IsReadOnly="True" Binding="{Binding SpermPermission.Name}"/>
+				<DataGridCheckBoxColumn Header="Разрешить" Binding="{Binding IsAllowed}"/>
+			</DataGrid.Columns>
+		</DataGrid>
+
+
+		<Border Grid.Row="2" Height="50" Background="{DynamicResource LightGrayBrush}">
+			<StackPanel Background="{ DynamicResource LightGrayBrush }" Orientation="Horizontal" HorizontalAlignment="Right">
+				<Button Content="Применить" Margin="10,10,10,10" Command="{Binding SavePermissionsCommand}"/>
+				<Button Content="Отмена" Margin="10,10,10,10" Click="Button_Cancel_Click"/>
+			</StackPanel>
+		</Border>
+	</Grid>
+
+
+</UserControl>

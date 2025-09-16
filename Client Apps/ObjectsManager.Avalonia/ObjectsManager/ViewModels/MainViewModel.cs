@@ -1,4 +1,6 @@
-﻿using CommunityToolkit.Mvvm.Input;
+﻿using Avalonia;
+using Avalonia.Controls.ApplicationLifetimes;
+using CommunityToolkit.Mvvm.Input;
 
 using GrpcServiceClient;
 using GrpcServiceClient.DataContracts;
@@ -7,7 +9,7 @@ using MsBox.Avalonia;
 
 using ObjectsManager.Helpers;
 using ObjectsManager.Interfaces;
-
+using ObjectsManager.Windows;
 using System;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
@@ -69,16 +71,15 @@ public partial class MainViewModel : ViewModelBase, IMainViewModel
     [RelayCommand]
     public async Task OpenRoleWindow()
     {
-
         try
         {
-            
+            var rolesWindow = new RolesWindow(new RolesViewModel(Service));
+            rolesWindow.Show();
         }
         catch (Exception e)
         {
             await MessageBoxManager.GetMessageBoxStandard(MessageBoxParamsHelper.GetErrorBoxParams($"Ошибка при открытии окна Роли -> {e.Message}")).ShowAsync();
         }
-
     }
 
     #endregion
