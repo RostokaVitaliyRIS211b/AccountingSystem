@@ -15,6 +15,7 @@ service AccountingSystem {
 	rpc GetAllGroupingProps(.google.protobuf.Empty) returns (List_GroupingProps);
 	rpc GetGroupingPropsByItem(PInt) returns (List_GroupingProps);
 	rpc GetAllTypesOfUnit(.google.protobuf.Empty) returns (List_TypesOfUnit);
+	rpc GetAllTypesOfItems(.google.protobuf.Empty) returns (List_TypeOfItems);
 	rpc GetAllRoles(.google.protobuf.Empty) returns (List_Roles);
 	rpc GetAllUsers(.google.protobuf.Empty) returns (List_Users);
 	rpc GetAllNames(.google.protobuf.Empty) returns (List_NameItems);
@@ -105,6 +106,10 @@ message List_MetaData{
 
 message List_Permissions{
 	repeated ProtoPermission permissions = 1;
+}
+
+message List_TypeOfItems{
+	repeated ProtoTypeOfItem types = 1;
 }
 
 message ProtoUser{

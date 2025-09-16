@@ -1,12 +1,14 @@
-﻿using Avalonia.Controls;
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Markup.Xaml;
 
 using ObjectsManager.Interfaces;
 
 namespace ObjectsManager.Windows;
 
-public partial class MainWindow : Window
+public partial class AddItemWindow : Window
 {
-    public MainWindow(IMainViewModel viewModel)
+    public AddItemWindow(IAddItemViewModel viewModel)
     {
         InitializeComponent();
         DataContext = viewModel;

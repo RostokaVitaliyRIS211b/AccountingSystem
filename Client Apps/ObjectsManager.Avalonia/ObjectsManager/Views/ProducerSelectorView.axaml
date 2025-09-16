@@ -1,0 +1,24 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="450"
+             x:Class="ObjectsManager.Views.ProducerSelectorView"
+			 xmlns:vm="clr-namespace:ObjectsManager.ViewModels"
+			 x:DataType="vm:ProducerSelectorViewModel">
+	<Grid RowDefinitions="auto,*">
+		<Border Background="{DynamicResource LightGrayBrush}" Height="50">
+			<Grid ColumnDefinitions="auto,*">
+				<Image Margin="10,0,0,0" Width="30" Source="/Assets/ColorIcons/icons8-search-100.png" ToolTip.Tip="Фильтр по имени единицы измерения"/>
+				<TextBox Grid.Column="1" Margin="10,0,10,0" VerticalAlignment="Center" HorizontalAlignment="Stretch" Text="{Binding FilterProducer}" ToolTip.Tip="Фильтр по имени единицы измерения" />
+			</Grid>
+		</Border>
+		<ListBox Grid.Row="1" ItemsSource="{Binding Producers}" SelectedItem="{Binding SelectedProducer}" DoubleTapped="ListBox_DoubleTapped">
+			<ListBox.ItemTemplate>
+				<DataTemplate>
+					<TextBlock Text="{Binding Name}"/>
+				</DataTemplate>
+			</ListBox.ItemTemplate>
+		</ListBox>
+	</Grid>
+</UserControl>

@@ -453,6 +453,18 @@ namespace GrpcServiceClient
         {
             await Client.CheckActiveAsync(new Google.Protobuf.WellKnownTypes.Empty());
         }
+
+        public List<TypeOfItem> GetAllTypesOfItems()
+        {
+            var reply = Client.GetAllTypesOfItems(new Google.Protobuf.WellKnownTypes.Empty());
+            return [.. reply.Types_.Select(x => new TypeOfItem(x))];
+        }
+
+        public async Task<List<TypeOfItem>> GetAllTypesOfItemsAsync()
+        {
+            var reply = await Client.GetAllTypesOfItemsAsync(new Google.Protobuf.WellKnownTypes.Empty());
+            return [.. reply.Types_.Select(x => new TypeOfItem(x))];
+        }
     }
 }
 

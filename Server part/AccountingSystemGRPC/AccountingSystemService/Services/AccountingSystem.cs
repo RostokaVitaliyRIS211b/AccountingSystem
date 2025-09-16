@@ -1,6 +1,7 @@
 using AccountingSystemService;
 using AccountingSystemService.DataCollections;
 using AccountingSystemService.Interfaces;
+using AccountingSystemService.Wrappers;
 
 using BdClasses;
 
@@ -621,6 +622,28 @@ namespace AccountingSystemService.Services
         public override Task<Empty> CheckActive(Empty request, ServerCallContext context)
         {
             return Task.FromResult(new Empty());
+        }
+
+        public override Task<List_TypeOfItems> GetAllTypesOfItems(Empty request, ServerCallContext context)
+        {
+            List_TypeOfItems res = new();
+            try
+            {
+                var types = db.TypeOfItems.ToList();
+                foreach(var type in types)
+                {
+                    var pType = new TypeOfItemWrapper();
+                    pType.Name = type.Name;
+                    pType.Id = type.Id;
+                    res.Types_.Add(pType.ProtoObject);
+                }
+            }
+            catch (Exception e)
+            {
+                ErrorHandler.HandleError($"Ошибка при получении списка типов записей -> {e.Message}", Severity.Error);
+            }
+            return Task.FromResult(res);
+
         }
     }
 }

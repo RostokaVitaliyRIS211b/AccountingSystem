@@ -3,10 +3,14 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:ObjectsManager.ViewModels"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             mc:Ignorable="d" d:DesignWidth="1400" d:DesignHeight="450"
              x:Class="ObjectsManager.Views.MainView"
 	         x:DataType="vm:MainViewModel"
-			 xmlns:gb="using:GroupBox.Avalonia.Controls">
+			 xmlns:gb="using:GroupBox.Avalonia.Controls"
+			 xmlns:th="using:Avalonia.Styling">
+	<UserControl.Resources>
+
+	</UserControl.Resources>
 	<Grid  RowDefinitions="auto,*,auto">
 		<Menu x:Name="MainMenu" Background="{DynamicResource LightGrayBrush}">
 			<MenuItem Header="Справочники">
@@ -23,7 +27,7 @@
 					</MenuItem.Icon>
 				</MenuItem>
 				
-				<MenuItem Header="Объекты">
+				<MenuItem Header="Объекты" Command="{Binding OpenObjectsWindowCommand}">
 					<MenuItem.Icon>
 						<Image Source="/Assets/ColorIcons/icons8-home-50.png"/>
 					</MenuItem.Icon>
@@ -31,8 +35,8 @@
 			</MenuItem>
 			
 			<MenuItem Header="Тема">
-				<MenuItem Header="Светлая"/>
-				<MenuItem Header="Темная"/>
+				<MenuItem Tag="{Binding Light}" Header="Светлая" Click="MenuItem_Theme_Click"/>
+				<MenuItem Tag="{Binding Dark}" Header="Темная" Click="MenuItem_Theme_Click"/>
 			</MenuItem>
 			
 		</Menu>
@@ -47,10 +51,17 @@
 				<Grid RowDefinitions="40,*">
 					<Grid Grid.Row="0" ColumnDefinitions="auto,*">
 						<Image ToolTip.Tip="Фильтр по имени объекта" Width="30" Source="/Assets/ColorIcons/icons8-search-100.png"/>
-						<TextBox Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="10,0,0,0" ToolTip.Tip="Фильтр по имени объекта"/>
+						<TextBox Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="10,0,0,0" ToolTip.Tip="Фильтр по имени объекта" Text="{Binding FilterObj}"/>
 					</Grid>
-					<ListBox Background="{DynamicResource WhiteBrush}" Grid.Row="1" ItemsSource="{Binding ConObjects}" SelectedItem="{Binding SelectedObj}">
-						
+					<ListBox Background="{DynamicResource WhiteBrush}" Grid.Row="1" ItemsSource="{Binding FilteredConObjects}" SelectedItem="{Binding SelectedObj}">
+						<ListBox.ItemTemplate>
+							<DataTemplate>
+								<StackPanel Orientation="Horizontal">
+									<Image Width="25" Source="/Assets/ColorIcons/icons8-home-100.png"/>
+									<TextBlock Text="{Binding Name}" Margin="5,0,10,0"/>
+								</StackPanel>
+							</DataTemplate>
+						</ListBox.ItemTemplate>
 					</ListBox>
 				</Grid>
 			</gb:GroupBox>
@@ -62,9 +73,24 @@
 					<Border Background="{ DynamicResource WhiteSmokeBrush }" Height="50" CornerRadius="3">
 						<StackPanel Orientation="Horizontal">
 							<TextBlock TextWrapping="Wrap" Text="План объекта:" Margin="10,0,0,0" VerticalAlignment="Center" />
+							<TextBlock TextWrapping="Wrap" Text="{Binding SelectedObjName, Mode=OneWay}" Margin="5,0,0,0" VerticalAlignment="Center" />
 						</StackPanel>
 					</Border>
 				</gb:GroupBox.Header>
+				<Grid RowDefinitions="auto,*">
+					<StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
+						<Button Background="Transparent" Command="" ToolTip.Tip="Добавить запись">
+							<Image Width="30" Source="/Assets/ColorIcons/icons8-plus-100.png"/>
+						</Button>
+						<Image Margin="10,0,0,0" ToolTip.Tip="Фильтр по наименованию записи" Width="30" Source="/Assets/ColorIcons/icons8-search-100.png"/>
+						<TextBox HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="10,0,0,0" Width="150" ToolTip.Tip="Фильтр по наименованию записи" Text="{Binding FilterObj}"/>
+						<TextBlock VerticalAlignment="Center" Text="Глубина группировки:" Margin="20,0,0,0"/>
+						<NumericUpDown Minimum="0" FormatString="0" Margin="10,0,0,0" AllowSpin="True" Value="{Binding NumberOfGroups}"/>
+					</StackPanel>
+					<DataGrid x:Name="mainDataGrid" AutoGenerateColumns="False" CanUserReorderColumns="True" CanUserSortColumns="True" CanUserResizeColumns="True" GridLinesVisibility="Horizontal" Grid.Row="1">
+						
+					</DataGrid>
+				</Grid>
 			</gb:GroupBox>
 		</Grid>
 		
