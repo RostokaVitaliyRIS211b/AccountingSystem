@@ -129,7 +129,8 @@ public partial class MainViewModel : ViewModelBase, IMainViewModel
         try
         {
             var rolesWindow = new RolesWindow(new RolesViewModel(Service));
-            rolesWindow.Show();
+            
+            await rolesWindow.ShowDialog(Win!);
         }
         catch (Exception e)
         {
@@ -137,7 +138,20 @@ public partial class MainViewModel : ViewModelBase, IMainViewModel
         }
 
     }
+    [RelayCommand]
+    public async Task OpenUserWindow()
+    {
+        try
+        {
+            var userWindow = new UsersWindow(new UsersViewModel(Service));
+            await userWindow.ShowDialog(Win!);
+        }
+        catch (Exception e)
+        {
+            await MessageBoxManager.GetMessageBoxStandard(MessageBoxParamsHelper.GetErrorBoxParams($"Ошибка при открытии окна Пользователи -> {e.Message}")).ShowAsync();
+        }
 
+    }
 
     [RelayCommand]
     public async Task OpenObjectsWindow()

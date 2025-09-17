@@ -21,7 +21,7 @@
 					</MenuItem.Icon>
 				</MenuItem>
 				
-				<MenuItem Header="Пользователи">
+				<MenuItem Header="Пользователи" Command="{Binding OpenUserWindowCommand}">
 					<MenuItem.Icon>
 						<Image Source="/Assets/ColorIcons/icons8-male-user-50.png"/>
 					</MenuItem.Icon>

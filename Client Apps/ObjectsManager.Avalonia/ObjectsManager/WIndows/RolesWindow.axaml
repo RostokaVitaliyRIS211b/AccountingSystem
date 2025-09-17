@@ -8,6 +8,7 @@
 		Icon="/Assets/ColorIcons/icons8-home-50.png"
         Title="Роли"
 		Width="1000"
+		CanResize="False"
 		Height="500">
 	<views:RolesView/>
 </Window>

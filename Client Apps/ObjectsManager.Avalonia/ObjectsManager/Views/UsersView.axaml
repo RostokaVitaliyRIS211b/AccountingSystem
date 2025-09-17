@@ -1,0 +1,79 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="500"
+             x:Class="ObjectsManager.Views.UsersView"
+			 xmlns:vm="clr-namespace:ObjectsManager.ViewModels"
+			 xmlns:gb="using:GroupBox.Avalonia.Controls"
+			 x:DataType="vm:UsersViewModel">
+
+
+	<Grid ColumnDefinitions="*,*">
+
+		<gb:GroupBox Grid.Column="0">
+			<gb:GroupBox.Header>
+				<Border Background="{ DynamicResource LightGrayBrush }" Height="50" CornerRadius="3">
+					<TextBlock TextWrapping="Wrap" FontWeight="Bold" FontSize="30" Text="Пользователи" Margin="10,0,0,0" VerticalAlignment="Center" />
+				</Border>
+			</gb:GroupBox.Header>
+
+			<Grid RowDefinitions="*,auto">
+				<ListBox Grid.Row="0" ItemsSource="{Binding UsersCollection}" SelectedItem="{Binding SelectedUser}" SelectionChanged="OnSelectionChanged" Background ="{DynamicResource WhiteBrush}">
+					<ListBox.ItemTemplate>
+						<DataTemplate>
+							<StackPanel Orientation="Horizontal">
+								<Image Width="25" Source="/Assets/ColorIcons/icons8-male-user-100.png"/>
+								<TextBlock Text="{Binding Name}" FontWeight="Bold" Margin="5,0,10,0" VerticalAlignment="Center"/>
+							</StackPanel>
+						</DataTemplate>
+					</ListBox.ItemTemplate>
+				</ListBox>
+
+				<Border Height="2" Background="LightGray" Grid.Row="1" VerticalAlignment="Top"/>
+				<StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
+					<Button Command="{Binding AddUserCommand}" Content="Добавить" Margin="5,10,5,5"/>
+					<Button Command="{Binding DelUserCommand}" Content="Удалить" Margin="5,10,5,5"/>
+				</StackPanel>
+			</Grid>
+		</gb:GroupBox>
+
+		<Border Width="3" Background="LightGray" Grid.Row="1" HorizontalAlignment="Right"/>
+		
+		<gb:GroupBox Grid.Column="1">
+			<gb:GroupBox.Header>
+				<Border Background="{ DynamicResource LightGrayBrush }" Height="50" CornerRadius="3">
+					<TextBlock TextWrapping="Wrap" FontWeight="Bold" FontSize="30" Text="Настройки" Margin="10,0,0,0" VerticalAlignment="Center" />
+				</Border>
+			</gb:GroupBox.Header>
+
+			<Grid RowDefinitions="auto,auto,auto,auto,auto,auto,auto,*">
+				<TextBlock Grid.Row="0" Text="Имя:" FontSize="18" Margin="0,10"/>
+				<TextBox Grid.Row="1" TextChanged="OnTextChanged" Text="{Binding SelectedUser.Name}"/>
+				
+				<TextBlock Grid.Row="2" Text="Пароль:" FontSize="18" Margin="0,10"/>
+				<Grid Grid.Row="3" ColumnDefinitions="*,auto">
+					<TextBox x:Name="saveButt" Grid.Column="0"/>
+					<Button Grid.Column="1" Click="SaveButtClick" Content="Сохранить" Margin="5,0"/>
+				</Grid>
+
+
+				<TextBlock Grid.Row="4" Text="Дополнительно:" FontSize="18" Margin="0,10"/>
+				<TextBox Grid.Row="5" Height="60" TextChanged="OnTextChanged" Text="{Binding SelectedUser.Description}"/>
+				<TextBlock Grid.Row="6" Text="Роли пользователя:" FontSize="18" Margin="0,10"/>
+
+				<ListBox Grid.Row="7" BorderThickness="1" ItemsSource="{Binding RolesCollection}" Background="{ DynamicResource WhiteBrush }" ScrollViewer.VerticalScrollBarVisibility="Visible">
+					<ListBox.ItemTemplate>
+						<DataTemplate>
+							<StackPanel Orientation="Horizontal">
+								<CheckBox IsChecked="{Binding IsAllowed}"/>
+								<Image Height="28" Width="28" Source="/Assets/ColorIcons/icons8-user-100.png"/>
+								<TextBlock Text="{Binding SpermRole.Name}"/>
+							</StackPanel>
+						</DataTemplate>
+					</ListBox.ItemTemplate>
+				</ListBox>
+			</Grid>
+		</gb:GroupBox>
+	</Grid>
+</UserControl>

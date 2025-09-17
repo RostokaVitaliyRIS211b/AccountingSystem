@@ -101,7 +101,7 @@ namespace ObjectsManager.ViewModels
             }
             catch (Exception e)
             {
-
+                MessageBoxManager.GetMessageBoxStandard(MessageBoxParamsHelper.GetErrorBoxParams($"Не удалось изменить роль -> {e.Message}")).ShowAsync();
             }
 
         }
