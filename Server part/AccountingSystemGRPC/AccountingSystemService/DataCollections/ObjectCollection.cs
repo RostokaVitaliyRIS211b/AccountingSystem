@@ -319,9 +319,13 @@ namespace AccountingSystemService.DataCollections
             {
                 using var db = DbContextHelper.GetConstructionContext();
                 var properties = db.GroupingPropertiesForItems.Where(x => x.ItemId == itemId).Select(x => x.PropId).ToList();
-                foreach (var property in GroupingProperties.Where(x => properties.Contains(x.Id)))
+                foreach (var propertyId in properties)
                 {
-                    res.Add(property.ProtoObject);
+                    var prop = GroupingProperties.FirstOrDefault(x => x.Id == propertyId);
+                    if(prop != null)
+                    {
+                        res.Add(prop.ProtoObject);
+                    }
                 }
 
             }
@@ -457,7 +461,7 @@ namespace AccountingSystemService.DataCollections
                 item.PricePerUnit = wrapper.PricePerUnit;
                 item.Description = wrapper.Description;
                 item.NameId = wrapper.NameItem?.Id ?? -1;
-                item.Objectid = wrapper.Obj?.Id ?? -1;
+                item.Objectid = wrapper.Obj?.Id;
                 item.ProducerId = wrapper.Producer?.Id ?? -1;
                 item.TypeOfItemId = wrapper.Type?.Id ?? -1;
                 item.TypeUnitId = wrapper.UnitType?.Id ?? -1;

@@ -18,9 +18,11 @@ namespace ObjectsManager.Interfaces
     {
         public string SelectedObjName { get; set; }
         public ConObject? SelectedObj { get; set; }
-        public Item? SelectedObjItem { get; set; }
+        public ItemWrapper? SelectedObjItem { get; set; }
         public ObservableCollection<ConObject> ConObjects { get; }
         public ObservableCollection<ConObject> FilteredConObjects { get; }
+
+        public ObservableCollection<ItemWrapper> SelectedItemsOfConObj { get; set; }
         public string FilterObj { get; set; }
         public abstract Task OpenRoleWindow();
         public abstract Task OpenObjectsWindow();
@@ -36,5 +38,23 @@ namespace ObjectsManager.Interfaces
         public ObservableCollection<ItemWrapper> ItemsOfConObj { get; set; }
 
         public abstract Task AddItem();
+
+        public abstract Task EditItem();
+
+        public abstract Task EditGroupingPropertiesOfItem();
+
+        public abstract Task DeleteItem();
+
+        public abstract Task AddGroupingPropToSelectedItems();
+
+        public abstract Task DeleteGroupingPropOfSelectedItems();
+
+        public abstract Task SetGroupingPropsOfSelectedItems();
+
+        public abstract bool FilteringItem(object item);
+
+        public Func<IEnumerable<ItemWrapper>>? GetSelectedItems { get; set; }
+
+        public Action FilterGrid { get; set; }
     }
 }

@@ -43,6 +43,10 @@ public partial class ConstructionContext : DbContext
 
     public virtual DbSet<User> Users { get; set; }
 
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
+        => optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=Construction;Username=postgres;Password=a");
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<GroupingPropertiesForItem>(entity =>
@@ -79,10 +83,9 @@ public partial class ConstructionContext : DbContext
             entity.HasIndex(e => e.TypeOfItemId, "fki_typItFKey");
 
             entity.Property(e => e.Id).UseIdentityAlwaysColumn();
-            entity.Property(e => e.CountOfUnits).HasDefaultValue(1);
-            entity.Property(e => e.CountOfUsedUnits).HasDefaultValue(0);
-            entity.Property(e => e.ExcpectedCost).HasDefaultValue(1);
-            entity.Property(e => e.PricePerUnit).HasDefaultValue(1);
+            entity.Property(e => e.CountOfUnits).HasDefaultValueSql("1");
+            entity.Property(e => e.ExcpectedCost).HasDefaultValueSql("1");
+            entity.Property(e => e.PricePerUnit).HasDefaultValueSql("1");
 
             entity.HasOne(d => d.Name).WithMany(p => p.Items)
                 .HasForeignKey(d => d.NameId)

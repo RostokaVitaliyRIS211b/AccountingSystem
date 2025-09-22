@@ -1,0 +1,26 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="ObjectsManager.Views.MetaDataView"
+			 xmlns:vm="clr-namespace:ObjectsManager.ViewModels"
+			 x:DataType="vm:MetaDataViewModel">
+	<Grid RowDefinitions="auto,*,auto">
+		<Menu>
+			<MenuItem Header="Файл">
+				<MenuItem Header="Загрузить" Command="{Binding LoadFileCommand}"/>
+				<MenuItem Header="Сохранить" Command="{Binding SaveFileCommand}"/>
+			</MenuItem>
+		</Menu>
+		<TabControl Margin="0,0,0,10" x:Name="tabCtrl" Grid.Row="1" SelectedItem="{Binding SelectedTabItem}">
+			
+		</TabControl>
+		<Border Grid.Row="2" Background="{DynamicResource LightGrayBrush}" Height="50">
+			<StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+				<Button Content="Применить" Command="{Binding ApplyChangesCommand}"/>
+				<Button Content="Отмена" Click="Button_Cancel_Click" Margin="10,0,10,0"/>
+			</StackPanel>
+		</Border>
+	</Grid>
+</UserControl>

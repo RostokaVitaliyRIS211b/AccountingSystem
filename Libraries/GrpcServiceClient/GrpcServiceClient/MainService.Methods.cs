@@ -465,6 +465,46 @@ namespace GrpcServiceClient
             var reply = await Client.GetAllTypesOfItemsAsync(new Google.Protobuf.WellKnownTypes.Empty());
             return [.. reply.Types_.Select(x => new TypeOfItem(x))];
         }
+
+        public bool SetGroupingPropertiesOfItem(List<GroupingProperty> groupingProps, int itemd)
+        {
+            var reply = Client.SetGroupingPropertiesOfItem(new()
+            {
+                Props = new List_GroupingProps()
+                {
+                    Props = { groupingProps.Select(x => x.ProtoObject) }
+                },
+                ItemId = itemd
+            });
+
+            return reply.Val;
+        }
+
+        public async Task<bool> SetGroupingPropertiesOfItemAsync(List<GroupingProperty> groupingProps, int itemd)
+        {
+            var reply = await Client.SetGroupingPropertiesOfItemAsync(new()
+            {
+                Props = new List_GroupingProps()
+                {
+                    Props = { groupingProps.Select(x => x.ProtoObject) }
+                },
+                ItemId = itemd
+            });
+
+            return reply.Val;
+        }
+
+        public List<MetaDataType> GetAllMetaDataTypes()
+        {
+            var reply = Client.GetAllMetaDataTypes(new Google.Protobuf.WellKnownTypes.Empty());
+            return [.. reply.Types_.Select(x => new MetaDataType(x))];
+        }
+
+        public async Task<List<MetaDataType>> GetAllMetaDataTypesAsync()
+        {
+            var reply = await Client.GetAllMetaDataTypesAsync(new Google.Protobuf.WellKnownTypes.Empty());
+            return [.. reply.Types_.Select(x => new MetaDataType(x))];
+        }
     }
 }
 

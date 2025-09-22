@@ -47,27 +47,27 @@ public partial class MainViewModel : ViewModelBase, IMainViewModel
             FilteredConObjects.Add(obj);
         }
 
-        foreach(var producer in await Service.GetAllProducersAsync())
+        foreach (var producer in await Service.GetAllProducersAsync())
         {
             Producers.Add(producer);
         }
 
-        foreach(var name in await Service.GetAllNamesAsync())
+        foreach (var name in await Service.GetAllNamesAsync())
         {
             Names.Add(name);
         }
 
-        foreach(var unitType in await Service.GetAllTypesOfUnitAsync())
+        foreach (var unitType in await Service.GetAllTypesOfUnitAsync())
         {
             TypesOfUnits.Add(unitType);
         }
 
-        foreach(var type in await Service.GetAllTypesOfItemsAsync())
+        foreach (var type in await Service.GetAllTypesOfItemsAsync())
         {
             TypesOfItems.Add(type);
         }
 
-        foreach(var prop in await Service.GetAllGroupingPropsAsync())
+        foreach (var prop in await Service.GetAllGroupingPropsAsync())
         {
             GroupingProperties.Add(prop);
         }
@@ -85,8 +85,8 @@ public partial class MainViewModel : ViewModelBase, IMainViewModel
     public ConObject? SelectedObj { get => _cobj; set { _cobj = value; OnPropertyChanged(nameof(SelectedObj)); OnPropertyChanged(nameof(SelectedObjName)); ConObjChanged(); } }
 
 
-    private Item? _item;
-    public Item? SelectedObjItem { get => _item; set { _item = value; OnPropertyChanged(nameof(SelectedObjItem)); } }
+    private ItemWrapper? _item;
+    public ItemWrapper? SelectedObjItem { get => _item; set { _item = value; OnPropertyChanged(nameof(SelectedObjItem)); } }
 
 
     public ObservableCollection<ConObject> ConObjects { get; } = [];
@@ -109,6 +109,8 @@ public partial class MainViewModel : ViewModelBase, IMainViewModel
 
     public ObservableCollection<ItemWrapper> ItemsOfConObj { get; set; } = [];
 
+    public ObservableCollection<ItemWrapper> SelectedItemsOfConObj { get; set; } = [];
+
     private ObservableCollection<NameItem> Names { get; } = [];
 
     private ObservableCollection<Producer> Producers { get; } = [];
@@ -118,6 +120,14 @@ public partial class MainViewModel : ViewModelBase, IMainViewModel
     private ObservableCollection<TypeOfItem> TypesOfItems { get; } = [];
 
     private ObservableCollection<GroupingProperty> GroupingProperties { get; } = [];
+
+
+    private string? itemFilter = "";
+    public string? FilterItem { get => itemFilter; set { itemFilter = value; OnPropertyChanged(nameof(FilterItem)); FilterGrid.Invoke(); } }
+
+    public Func<IEnumerable<ItemWrapper>>? GetSelectedItems { get; set; }
+
+    public Action FilterGrid { get; set; }
 
     #endregion
 
@@ -129,7 +139,7 @@ public partial class MainViewModel : ViewModelBase, IMainViewModel
         try
         {
             var rolesWindow = new RolesWindow(new RolesViewModel(Service));
-            
+
             await rolesWindow.ShowDialog(Win!);
         }
         catch (Exception e)
@@ -175,10 +185,19 @@ public partial class MainViewModel : ViewModelBase, IMainViewModel
     [RelayCommand]
     public async Task AddItem()
     {
-
         try
         {
-
+            var dataContext = new AddItemViewModel(null, SelectedObj, Service, GroupingProperties);
+            var window = new AddItemWindow(dataContext);
+            window.Title += SelectedObjName;
+            if (Win != null)
+            {
+                await window.ShowDialog(Win);
+                if (dataContext.Wrapper.SourceItem.Id != -1)
+                {
+                    ItemsOfConObj.Add(dataContext.Wrapper);
+                }
+            }
         }
         catch (Exception e)
         {
@@ -186,7 +205,256 @@ public partial class MainViewModel : ViewModelBase, IMainViewModel
         }
     }
 
+
+    [RelayCommand]
+    public async Task EditItem()
+    {
+        try
+        {
+            if (SelectedObjItem is null)
+            {
+                await MessageBoxManager.GetMessageBoxStandard(MessageBoxParamsHelper.GetErrorBoxParams($"Выберите запись для редактирования")).ShowAsync();
+                return;
+            }
+
+            var dataContext = new AddItemViewModel(SelectedObjItem, SelectedObj, Service, GroupingProperties);
+            var window = new AddItemWindow(dataContext);
+            window.Title = $"Редактикрование свойств записи {SelectedObjItem.SourceItem.NameItem?.Name}";
+
+            if (Win != null)
+            {
+                await window.ShowDialog(Win);
+            }
+        }
+        catch (Exception e)
+        {
+
+            await MessageBoxManager.GetMessageBoxStandard(MessageBoxParamsHelper.GetErrorBoxParams($"Ошибка при открытии окна редактирования записи -> {e.Message}")).ShowAsync();
+        }
+    }
+
+
+    [RelayCommand]
+    public async Task EditGroupingPropertiesOfItem()
+    {
+        try
+        {
+            if (SelectedObjItem is null)
+            {
+                await MessageBoxManager.GetMessageBoxStandard(MessageBoxParamsHelper.GetErrorBoxParams($"Выберите запись для редактирования свойств группировки")).ShowAsync();
+                return;
+            }
+
+            var dataContext = new EditGroupingPropsOfItemViewModel(SelectedObjItem, Service, GroupingProperties);
+            var window = new EditGroupingPropsOfItemWindow(dataContext);
+            window.Title += SelectedObjItem.SourceItem.NameItem?.Name ?? "";
+
+            if (Win != null)
+            {
+                await window.ShowDialog(Win);
+            }
+        }
+        catch (Exception e)
+        {
+            await MessageBoxManager.GetMessageBoxStandard(MessageBoxParamsHelper.GetErrorBoxParams($"Ошибка при открытии окна редактирования свойств группировки -> {e.Message}")).ShowAsync();
+        }
+    }
+
+
+    [RelayCommand]
+    public async Task DeleteItem()
+    {
+        if (SelectedObjItem is null)
+        {
+            await MessageBoxManager.GetMessageBoxStandard(MessageBoxParamsHelper.GetErrorBoxParams($"Выберите запись для редактирования свойств группировки")).ShowAsync();
+            return;
+        }
+
+        try
+        {
+            var res = await MessageBoxManager.GetMessageBoxCustom(MessageBoxParamsHelper.GetYesOrNoQuestionBoxParams("Вопрос", $"Удалить запись {SelectedObjItem.SourceItem.NameItem?.Name} ?")).ShowAsync();
+            if (res != "Да")
+            {
+                return;
+            }
+
+            if (await Service.RemoveItemAsync(SelectedObjItem.SourceItem))
+            {
+                ItemsOfConObj.Remove(SelectedObjItem);
+                SelectedObjItem = null;
+            }
+            else
+            {
+                await MessageBoxManager.GetMessageBoxStandard(MessageBoxParamsHelper.GetErrorBoxParams($"Ошибка при удалении записи")).ShowAsync();
+            }
+        }
+        catch (Exception e)
+        {
+            await MessageBoxManager.GetMessageBoxStandard(MessageBoxParamsHelper.GetErrorBoxParams($"Ошибка при удалении записи -> {e.Message}")).ShowAsync();
+        }
+    }
+
+
+    [RelayCommand]
+    public async Task AddGroupingPropToSelectedItems()
+    {
+        try
+        {
+            var dataContext = new EditGroupingPropsOfItemViewModel(new ItemWrapper(new Item() { Id = -1 }), Service, GroupingProperties);
+            var window = new EditGroupingPropsOfItemWindow(dataContext);
+            window.Title = "Выбор свойств группировки для добавления";
+
+            if (Win is not null)
+            {
+                await window.ShowDialog(Win);
+            }
+
+            if (dataContext.SelectedProps.Count > 0)
+            {
+                var selected = GetSelectedItems?.Invoke();
+                if (selected != null)
+                {
+                    foreach (var item in selected)
+                    {
+                        foreach (var prop in dataContext.SelectedProps)
+                        {
+                            if (item.GroupingProperties.FirstOrDefault(x => x.Id == prop.Id) is null)
+                            {
+                                if (await Service.AddGroupingPropertyOfItemAsync(prop, item.SourceItem.Id))
+                                {
+                                    item.GroupingProperties.Add(prop);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            await MessageBoxManager.GetMessageBoxStandard(MessageBoxParamsHelper.GetErrorBoxParams($"Ошибка при открытии окна для добавления свойства группировки -> {e.Message}")).ShowAsync();
+        }
+    }
+
+
+    [RelayCommand]
+    public async Task DeleteGroupingPropOfSelectedItems()
+    {
+        try
+        {
+            var dataContext = new EditGroupingPropsOfItemViewModel(new ItemWrapper(new Item() { Id = -1 }), Service, GroupingProperties);
+            var window = new EditGroupingPropsOfItemWindow(dataContext);
+            window.Title = "Выбор свойств группировки для удаления";
+
+            if (Win is not null)
+            {
+                await window.ShowDialog(Win);
+            }
+
+            if (dataContext.SelectedProps.Count > 0)
+            {
+                var selected = GetSelectedItems?.Invoke();
+                if (selected != null)
+                {
+                    foreach (var item in selected)
+                    {
+                        foreach (var prop in dataContext.SelectedProps)
+                        {
+                            if (item.GroupingProperties.FirstOrDefault(x => x.Id == prop.Id) is GroupingProperty pr)
+                            {
+                                if (await Service.RemoveGroupingPropertyOfItemAsync(prop, item.SourceItem.Id))
+                                {
+                                    item.GroupingProperties.Remove(pr);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            await MessageBoxManager.GetMessageBoxStandard(MessageBoxParamsHelper.GetErrorBoxParams($"Ошибка при открытии окна для удаления свойства группировки -> {e.Message}")).ShowAsync();
+        }
+    }
+
+
+    [RelayCommand]
+    public async Task SetGroupingPropsOfSelectedItems()
+    {
+        try
+        {
+            var dataContext = new EditGroupingPropsOfItemViewModel(new ItemWrapper(new Item() { Id = -1 }), Service, GroupingProperties);
+            var window = new EditGroupingPropsOfItemWindow(dataContext);
+            window.Title = "Выбор свойств группировки";
+
+            if (Win is not null)
+            {
+                await window.ShowDialog(Win);
+            }
+
+            if (dataContext.SelectedProps.Count > 0)
+            {
+                var selected = GetSelectedItems?.Invoke();
+                if (selected != null)
+                {
+                    foreach (var item in selected)
+                    {
+                        if (await Service.SetGroupingPropertiesOfItemAsync([.. dataContext.SelectedProps], item.SourceItem.Id))
+                        {
+                            item.GroupingProperties.Clear();
+                            foreach(var prop in dataContext.SelectedProps)
+                            {
+                                item.GroupingProperties.Add(prop);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            await MessageBoxManager.GetMessageBoxStandard(MessageBoxParamsHelper.GetErrorBoxParams($"Ошибка при открытии окна для редактирования свойств группировки у выбранных элементов -> {e.Message}")).ShowAsync();
+        }
+    }
+
+
+    [RelayCommand]
+    public async Task OpenMetaDataWindow()
+    {
+
+        try
+        {
+            if(SelectedObjItem != null)
+            {
+                var dataContext = new MetaDataViewModel(SelectedObjItem, Service);
+                var window = new MetaDataWindow(dataContext);
+                window.Title += $"{SelectedObjItem.SourceItem.NameItem?.Name}";
+
+                if(Win is not null)
+                {
+                    await window.ShowDialog(Win);
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            await MessageBoxManager.GetMessageBoxStandard(MessageBoxParamsHelper.GetErrorBoxParams($"Ошибка при открытии окна просмотра метаданных -> {e.Message}")).ShowAsync();
+        }
+
+    }
+
+
     #endregion
+
+    public bool FilteringItem(object item)
+    {
+        if (item is ItemWrapper wrapper)
+        {
+            return wrapper.SourceItem.NameItem?.Name.Contains(FilterItem ?? "", StringComparison.OrdinalIgnoreCase) ?? false;
+        }
+        return false;
+    }
 
     private void Filter()
     {
@@ -212,7 +480,7 @@ public partial class MainViewModel : ViewModelBase, IMainViewModel
             }
             FilterObj = "";
         }
-        catch 
+        catch
         {
 
         }
@@ -237,5 +505,5 @@ public partial class MainViewModel : ViewModelBase, IMainViewModel
         }
     }
 
-   
+
 }

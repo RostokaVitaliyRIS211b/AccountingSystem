@@ -138,7 +138,10 @@ namespace AccountingSystemService.DataCollections
                     using var db = DbContextHelper.GetConstructionContext();
 
                     wr.Name = wrapper.Name;
-                    wr.Password = wrapper.Password;
+                    if (!string.IsNullOrWhiteSpace(wrapper.Password))
+                    {
+                        wr.Password = wrapper.Password;
+                    }
                     wr.Description = wrapper.Description;
                     wr.Roles = [];
                     foreach(var x in wrapper.Roles)
@@ -150,7 +153,10 @@ namespace AccountingSystemService.DataCollections
                     if(user != null)
                     {
                         user.Name = wrapper.Name;
-                        user.Password = wrapper.Password;
+                        if (!string.IsNullOrWhiteSpace(wrapper.Password))
+                        {
+                            user.Password = wrapper.Password;
+                        }
                         user.Description = wrapper.Description;
                         db.SaveChanges();
 

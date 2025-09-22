@@ -11,13 +11,14 @@ using System.Threading.Tasks;
 
 namespace ObjectsManager.ViewModels
 {
-    public class ItemWrapper:INotifyPropertyChanged
+    public class ItemWrapper:INotifyPropertyChanged,IDisposable
     {
-        public ItemWrapper(NameItem name, Producer producer, TypeOfItem type, TypeOfUnit unit, ConObject obj, 
-            int expectedCost, int countOfUnits, int pricePerUnit, int countOfUsedUnits,string description,
+        public ItemWrapper(NameItem name, Producer producer, TypeOfItem type, TypeOfUnit unit, ConObject? obj, 
+            double expectedCost, double countOfUnits, double pricePerUnit, double countOfUsedUnits,string description,
             params GroupingProperty[] groupingProperties)
         {
             SourceItem = new();
+            SourceItem.NameItem = name;
             SourceItem.Producer = producer;
             SourceItem.Type = type;
             SourceItem.UnitType = unit;
@@ -31,6 +32,7 @@ namespace ObjectsManager.ViewModels
             {
                 GroupingProperties.Add(groupingProperty);
             }
+            SourceItem.PropertyChanged += SourceItem_PropertyChanged;
         }
 
         public ItemWrapper(Item item, params GroupingProperty[] groupingProperties)
@@ -40,13 +42,27 @@ namespace ObjectsManager.ViewModels
             {
                 GroupingProperties.Add(groupingProperty);
             }
+            SourceItem.PropertyChanged += SourceItem_PropertyChanged;
+        }
+
+        private void SourceItem_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if(e.PropertyName == nameof(Item.CountOfUnits) || e.PropertyName == nameof(Item.CountOfUsedUnits)
+                || e.PropertyName == nameof(Item.ExpectedCost) || e.PropertyName == nameof(Item.PricePerUnit) )
+            {
+                OnPropertyChanged(nameof(RemainsUnits));
+                OnPropertyChanged(nameof(Overspend));
+                OnPropertyChanged(nameof(RealSpend));
+            }
         }
 
         public Item SourceItem { get; }
 
-        public int RemainsUnits => SourceItem.CountOfUnits - SourceItem.CountOfUsedUnits;
+        public double RemainsUnits => SourceItem.CountOfUnits - SourceItem.CountOfUsedUnits;
 
-        public int Overspend =>  SourceItem.CountOfUnits * SourceItem.PricePerUnit - SourceItem.ExpectedCost;
+        public double Overspend => RealSpend - SourceItem.ExpectedCost;
+
+        public double RealSpend => SourceItem.CountOfUnits * SourceItem.PricePerUnit;
 
         public ObservableCollection<GroupingProperty> GroupingProperties { get; } = [];
 
@@ -55,6 +71,11 @@ namespace ObjectsManager.ViewModels
         protected void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        public void Dispose()
+        {
+            SourceItem.PropertyChanged -= SourceItem_PropertyChanged;
         }
     }
 }

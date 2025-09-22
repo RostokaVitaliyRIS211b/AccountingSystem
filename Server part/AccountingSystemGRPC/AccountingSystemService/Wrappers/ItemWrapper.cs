@@ -96,7 +96,7 @@ namespace AccountingSystemService.Wrappers
             }
         }
 
-        public int CountOfUnits
+        public double CountOfUnits
         {
             get => ProtoObject.CountOfUnits;
             set
@@ -106,7 +106,7 @@ namespace AccountingSystemService.Wrappers
             }
         }
 
-        public int PricePerUnit
+        public double PricePerUnit
         {
             get => ProtoObject.PricePerUnit;
             set
@@ -116,7 +116,7 @@ namespace AccountingSystemService.Wrappers
             }
         }
 
-        public int ExpectedCost
+        public double ExpectedCost
         {
             get => ProtoObject.ExpectedCost;
             set
@@ -172,7 +172,7 @@ namespace AccountingSystemService.Wrappers
             }
         }
 
-        public int CountOfUsedUnits
+        public double CountOfUsedUnits
         {
             get => ProtoObject.CountOfUsedUnits;
             set

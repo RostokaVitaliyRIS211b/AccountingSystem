@@ -2,9 +2,139 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="450"
+             mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="1650"
              x:Class="ObjectsManager.Views.AddItemView"
 			 xmlns:vm="clr-namespace:ObjectsManager.ViewModels"
+			 xmlns:gb="using:GroupBox.Avalonia.Controls"
 			 x:DataType="vm:AddItemViewModel">
+	<Grid RowDefinitions="*,auto">
+		<gb:GroupBox>
+			<gb:GroupBox.Header>
+				<Border x:Name="objBorder" Background="{ DynamicResource WhiteSmokeBrush }" Height="50" CornerRadius="3">
+					<TextBlock TextWrapping="Wrap" Text="Параметры записи" Margin="10,0,0,0" VerticalAlignment="Center" />
+				</Border>
+			</gb:GroupBox.Header>
+			<ScrollViewer  VerticalAlignment="Top" Margin="10,10" VerticalScrollBarVisibility="Auto">
+				<StackPanel Orientation="Vertical">
+					<gb:GroupBox BorderThickness="1" BorderBrush="{DynamicResource LightGrayBrush}" Height="90">
+						<gb:GroupBox.Header>
+							<Border Background="{ DynamicResource LightGrayBrush }" Height="40" CornerRadius="3">
+								<StackPanel Orientation="Horizontal">
+									<TextBlock TextWrapping="Wrap" Text="Наименование:" Margin="10,0,0,0" VerticalAlignment="Center" />
+									<Button Background="Transparent" Margin="20,0,0,0" Content="Все наименования..." Command="{Binding OpenNameSelectorWindowCommand}"/>
+								</StackPanel>
+							</Border>
+						</gb:GroupBox.Header>
+						<TextBox Text="{Binding Wrapper.SourceItem.NameItem.Name}"/>
+					</gb:GroupBox>
+					
+					<gb:GroupBox Margin="0,20,0,0" BorderThickness="1" BorderBrush="{DynamicResource LightGrayBrush}" Height="90">
+						<gb:GroupBox.Header>
+							<Border Background="{ DynamicResource LightGrayBrush }" Height="40" CornerRadius="3">
+								<StackPanel Orientation="Horizontal">
+									<TextBlock TextWrapping="Wrap" Text="Тип записи:" Margin="10,0,0,0" VerticalAlignment="Center" />
+								</StackPanel>
+							</Border>
+						</gb:GroupBox.Header>
+						<ComboBox HorizontalAlignment="Stretch" ItemsSource="{Binding TypeOfItems}" SelectedItem="{Binding Wrapper.SourceItem.Type}">
+							<ComboBox.ItemTemplate>
+								<DataTemplate>
+									<TextBlock Text="{Binding Name}"/>
+								</DataTemplate>
+							</ComboBox.ItemTemplate>
+						</ComboBox>
+					</gb:GroupBox>
 
+					<gb:GroupBox Margin="0,20,0,0" BorderThickness="1" BorderBrush="{DynamicResource LightGrayBrush}" Height="90">
+						<gb:GroupBox.Header>
+							<Border Background="{ DynamicResource LightGrayBrush }" Height="40" CornerRadius="3">
+								<StackPanel Orientation="Horizontal">
+									<TextBlock TextWrapping="Wrap" Text="Тип единицы измерения:" Margin="10,0,0,0" VerticalAlignment="Center" />
+									<Button Background="Transparent" Margin="20,0,0,0" Content="Все единицы измерения..." Command="{Binding OpenTypeOfUnitSelectorCommand}"/>
+								</StackPanel>
+							</Border>
+						</gb:GroupBox.Header>
+						<TextBox Text="{Binding Wrapper.SourceItem.UnitType.Name}"/>
+					</gb:GroupBox>
+
+					
+					
+					<gb:GroupBox Margin="0,20,0,0" BorderThickness="1" BorderBrush="{DynamicResource LightGrayBrush}" Height="90">
+						<gb:GroupBox.Header>
+							<Border Background="{ DynamicResource LightGrayBrush }" Height="40" CornerRadius="3">
+								<StackPanel Orientation="Horizontal">
+									<TextBlock TextWrapping="Wrap" Text="Количество закупленных единиц" Margin="10,0,0,0" VerticalAlignment="Center" />
+								</StackPanel>
+							</Border>
+						</gb:GroupBox.Header>
+						<TextBox Text="{Binding Wrapper.SourceItem.CountOfUnits}"/>
+					</gb:GroupBox>
+
+					<gb:GroupBox Margin="0,20,0,0" BorderThickness="1" BorderBrush="{DynamicResource LightGrayBrush}" Height="90">
+						<gb:GroupBox.Header>
+							<Border Background="{ DynamicResource LightGrayBrush }" Height="40" CornerRadius="3">
+								<StackPanel Orientation="Horizontal">
+									<TextBlock TextWrapping="Wrap" Text="Цена за единицу" Margin="10,0,0,0" VerticalAlignment="Center" />
+								</StackPanel>
+							</Border>
+						</gb:GroupBox.Header>
+						<TextBox Text="{Binding Wrapper.SourceItem.PricePerUnit}"/>
+					</gb:GroupBox>
+
+					<gb:GroupBox Margin="0,20,0,0" BorderThickness="1" BorderBrush="{DynamicResource LightGrayBrush}" Height="90">
+						<gb:GroupBox.Header>
+							<Border Background="{ DynamicResource LightGrayBrush }" Height="40" CornerRadius="3">
+								<StackPanel Orientation="Horizontal">
+									<TextBlock TextWrapping="Wrap" Text="Ожидаемый расход" Margin="10,0,0,0" VerticalAlignment="Center" />
+								</StackPanel>
+							</Border>
+						</gb:GroupBox.Header>
+						<TextBox Text="{Binding Wrapper.SourceItem.ExpectedCost}"/>
+					</gb:GroupBox>
+
+					<gb:GroupBox Margin="0,20,0,0" BorderThickness="1" BorderBrush="{DynamicResource LightGrayBrush}" Height="90">
+						<gb:GroupBox.Header>
+							<Border Background="{ DynamicResource LightGrayBrush }" Height="40" CornerRadius="3">
+								<StackPanel Orientation="Horizontal">
+									<TextBlock TextWrapping="Wrap" Text="Количество использованных единиц" Margin="10,0,0,0" VerticalAlignment="Center" />
+								</StackPanel>
+							</Border>
+						</gb:GroupBox.Header>
+						<TextBox Text="{Binding Wrapper.SourceItem.CountOfUsedUnits}"/>
+					</gb:GroupBox>
+
+					<gb:GroupBox Margin="0,20,0,0" BorderThickness="1" BorderBrush="{DynamicResource LightGrayBrush}" Height="90">
+						<gb:GroupBox.Header>
+							<Border Background="{ DynamicResource LightGrayBrush }" Height="40" CornerRadius="3">
+								<StackPanel Orientation="Horizontal">
+									<TextBlock TextWrapping="Wrap" Text="Производитель: " Margin="10,0,0,0" VerticalAlignment="Center" />
+									<Button Background="Transparent" Margin="20,0,0,0" Content="Все производители..." Command="{Binding OpenProducerSelectorWindowCommand}"/>
+								</StackPanel>
+							</Border>
+						</gb:GroupBox.Header>
+						<TextBox Text="{Binding Wrapper.SourceItem.Producer.Name}"/>
+					</gb:GroupBox>
+
+					<gb:GroupBox Margin="0,20,0,0" BorderThickness="1" BorderBrush="{DynamicResource LightGrayBrush}" Height="90">
+						<gb:GroupBox.Header>
+							<Border Background="{ DynamicResource LightGrayBrush }" Height="40" CornerRadius="3">
+								<StackPanel Orientation="Horizontal">
+									<TextBlock TextWrapping="Wrap" Text="Описание" Margin="10,0,0,0" VerticalAlignment="Center" />
+								</StackPanel>
+							</Border>
+						</gb:GroupBox.Header>
+						<TextBox Text="{Binding Wrapper.SourceItem.Description}"/>
+					</gb:GroupBox>
+					
+					<Button Margin="0,20,0,0" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" Content="Редактирование свойств группировки" Command="{Binding EditGroupingPropertiesCommand}"/>
+				</StackPanel>
+			</ScrollViewer>
+		</gb:GroupBox>
+		<Border Grid.Row="1" Height="50" Background="{DynamicResource LightGrayBrush}">
+			<StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
+				<Button Content="Применить" Command="{Binding ApplyChangesCommand}"/>
+				<Button Margin="10,0,10,0" Content="Отмена" Click="Button_Cancel_Click"/>
+			</StackPanel>
+		</Border>
+	</Grid>
 </UserControl>

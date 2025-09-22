@@ -2,8 +2,41 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="450"
+             mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="600"
              x:Class="ObjectsManager.Views.EditGroupingPropsOfItemView"
-			 xmlns:vm="clr-namespace:ObjectsManager.ViewModels">
+			 xmlns:vm="clr-namespace:ObjectsManager.ViewModels"
+			 x:DataType="vm:EditGroupingPropsOfItemViewModel">
+	<Grid RowDefinitions="auto,*,auto">
+		<Border Height="50" Background="{DynamicResource LightGrayBrush}">
+			<Grid ColumnDefinitions="auto,*">
+				<Image Margin="10,0" Width="30" Source="/Assets/ColorIcons/icons8-search-100.png"/>
+				<TextBox Margin="0,0,10,0" VerticalAlignment="Center" Grid.Column="1" Text="{Binding FilterGProp}"/>
+			</Grid>
+		</Border>
+		<ListBox x:Name="mainList" Focusable="True" KeyDown="ListBox_KeyDown"  Grid.Row="1" Background="{DynamicResource WhiteBrush}" ItemsSource="{Binding ChGProps}">
+			<ListBox.Styles>
 
+			</ListBox.Styles>
+			<ListBox.ItemTemplate>
+				<DataTemplate x:DataType="vm:CheckGroupProp">
+					<StackPanel Orientation="Horizontal">
+						<CheckBox IsChecked="{Binding IsSelected}"/>
+						<TextBlock Margin="5,0,0,0" Text="{Binding Property.Name}" VerticalAlignment="Center" />
+					</StackPanel>
+				</DataTemplate>
+			</ListBox.ItemTemplate>
+		</ListBox>
+		<Border Grid.Row="2" Height="100" Background="{DynamicResource LightGrayBrush}">
+			<Grid Margin="10,0,0,10" RowDefinitions="*,auto">
+				<Grid ColumnDefinitions="*,auto">
+					<TextBox VerticalAlignment="Center" Text="{Binding NameOfNewProp}"/>
+					<Button Grid.Column="1" Margin="10,0,10,0" Content="Добавить" Command="{Binding AddGroupingPropCommand}"/>
+				</Grid>
+				<StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
+					<Button Content="Применить" Command="{Binding ApplyPropsCommand}"/>
+					<Button Margin="10,0,10,0" Content="Отмена" Click="Button_Cancel_Click"/>
+				</StackPanel>
+			</Grid>
+		</Border>
+	</Grid>
 </UserControl>

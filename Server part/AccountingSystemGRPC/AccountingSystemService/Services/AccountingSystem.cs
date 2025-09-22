@@ -1,5 +1,6 @@
 using AccountingSystemService;
 using AccountingSystemService.DataCollections;
+using AccountingSystemService.Helpers;
 using AccountingSystemService.Interfaces;
 using AccountingSystemService.Wrappers;
 
@@ -10,6 +11,7 @@ using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
 
 namespace AccountingSystemService.Services
 {
@@ -211,7 +213,7 @@ namespace AccountingSystemService.Services
             PInt result = new() { Val = -1 };
             try
             {
-                result.Val = usrColl.AddUser(request.Name,request.Password,request.Description);
+                result.Val = usrColl.AddUser(request.Name, request.Password, request.Description);
                 ErrorHandler.HandleError($"Пользователь {request.Name} добавлен", Severity.Information);
             }
             catch (Exception e)
@@ -494,7 +496,7 @@ namespace AccountingSystemService.Services
             PBool result = new() { Val = false };
             try
             {
-                result.Val = objColl.RemoveObject(request.Id,request.Name);
+                result.Val = objColl.RemoveObject(request.Id, request.Name);
                 ErrorHandler.HandleError($"Объект {request.Name} удален", Severity.Information);
             }
             catch (Exception e)
@@ -510,7 +512,7 @@ namespace AccountingSystemService.Services
             PBool result = new() { Val = false };
             try
             {
-                result.Val = usrColl.RemoveRole(request.Id,request.Name);
+                result.Val = usrColl.RemoveRole(request.Id, request.Name);
                 ErrorHandler.HandleError($"Роль {request.Name} удалена", Severity.Information);
             }
             catch (Exception e)
@@ -526,7 +528,7 @@ namespace AccountingSystemService.Services
             PBool result = new() { Val = false };
             try
             {
-                result.Val = usrColl.RemoveUser(request.Id,request.Name);
+                result.Val = usrColl.RemoveUser(request.Id, request.Name);
                 ErrorHandler.HandleError($"Пользователь {request.Name} удален", Severity.Information);
             }
             catch (Exception e)
@@ -629,8 +631,8 @@ namespace AccountingSystemService.Services
             List_TypeOfItems res = new();
             try
             {
-                var types = db.TypeOfItems.ToList();
-                foreach(var type in types)
+                var types = db.TypeOfItems.AsNoTracking().ToList();
+                foreach (var type in types)
                 {
                     var pType = new TypeOfItemWrapper();
                     pType.Name = type.Name;
@@ -644,6 +646,63 @@ namespace AccountingSystemService.Services
             }
             return Task.FromResult(res);
 
+        }
+
+        [Authorize(Roles = "15")]
+        public override Task<PBool> SetGroupingPropertiesOfItem(ChangeGroupingPropertiesofItem request, ServerCallContext context)
+        {
+            PBool result = new() { Val = false };
+
+            try
+            {
+                var db = DbContextHelper.GetConstructionContext();
+                var propsOfItem = db.GroupingPropertiesForItems.AsNoTracking().Where(x=>x.ItemId == request.ItemId).ToList();
+                foreach(var prop in propsOfItem)
+                {
+                    db.GroupingPropertiesForItems.Remove(prop);
+                }
+
+                db.SaveChanges();
+
+                ErrorHandler.HandleError($"Свойства группировки записи {request.ItemId}  удалены",Severity.Information);
+
+                foreach(var prop in request.Props.Props)
+                {
+                    var gg = new GroupingPropertiesForItem();
+                    gg.PropId = prop.Id;
+                    gg.ItemId = request.ItemId;
+                    db.GroupingPropertiesForItems.Add(gg);
+                }
+                
+                db.SaveChanges();
+
+                ErrorHandler.HandleError($"Свойства группировки записи {request.ItemId} добавлены", Severity.Information);
+
+                result.Val = true;
+            }
+            catch (Exception e)
+            {
+                ErrorHandler.HandleError($"Ошибка при изменении свойств группировки записи -> {e.Message}", Severity.Error);
+            }
+            return Task.FromResult(result);
+        }
+
+        public override Task<List_MetaDataTypes> GetAllMetaDataTypes(Empty request, ServerCallContext context)
+        {
+            List_MetaDataTypes dataTypes = new();
+            try
+            {
+                var db = DbContextHelper.GetConstructionContext();
+                foreach(var type in db.TypesOfMetaData.ToList())
+                {
+                    dataTypes.Types_.Add(new ProtoMetaDataType() {Id = type.Id, Name = type.Name });
+                }
+            }
+            catch (Exception e)
+            {
+                ErrorHandler.HandleError($"Ошибка при получении всех типов метаданных {e.Message}", Severity.Error);
+            }
+            return Task.FromResult(dataTypes);
         }
     }
 }

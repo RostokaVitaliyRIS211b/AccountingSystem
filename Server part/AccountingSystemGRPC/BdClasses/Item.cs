@@ -11,11 +11,11 @@ public partial class Item
 
     public int TypeUnitId { get; set; }
 
-    public int CountOfUnits { get; set; }
+    public double CountOfUnits { get; set; }
 
-    public int PricePerUnit { get; set; }
+    public double PricePerUnit { get; set; }
 
-    public int ExcpectedCost { get; set; }
+    public double ExcpectedCost { get; set; }
 
     public int ProducerId { get; set; }
 
@@ -25,7 +25,7 @@ public partial class Item
 
     public int NameId { get; set; }
 
-    public int CountOfUsedUnits { get; set; }
+    public double CountOfUsedUnits { get; set; }
 
     public virtual ICollection<GroupingPropertiesForItem> GroupingPropertiesForItems { get; set; } = new List<GroupingPropertiesForItem>();
 

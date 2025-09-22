@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+	 <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	  <Authors>Ростока Виталий</Authors>
+	  <Version>1.0.0</Version>
+	  <Description>Необходимо подключить стили ImageViewerStyle и PdfViewerStyle</Description>
+	<PackageOutputPath>..\nuget-packages</PackageOutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <AvaloniaResource Include="Assets\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="11.3.5" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.5" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.5" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+
+    <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
+    <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.3.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Controls.Avalonia.PdfViewer\Controls.Avalonia.PdfViewer.csproj" />
+  </ItemGroup>
+</Project>

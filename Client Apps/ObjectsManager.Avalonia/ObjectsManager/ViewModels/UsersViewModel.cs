@@ -37,7 +37,7 @@ namespace ObjectsManager.ViewModels
         public ObservableCollection<CheckBoxRole> RolesCollection { get; } = [];
 
         private User? _user;
-        public User? SelectedUser { get => _user; set { _user = value; OnPropertyChanged(nameof(SelectedUser)); } }
+        public User? SelectedUser { get => _user; set { UserChanged(value); _user = value; OnPropertyChanged(nameof(SelectedUser)); } }
         public void UpdateCheckBox()
         {
             foreach (CheckBoxRole role in RolesCollection)
@@ -51,6 +51,24 @@ namespace ObjectsManager.ViewModels
         private void Role_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             RoleChanged();
+        }
+
+        private void UserChanged(User? user)
+        {
+            if(SelectedUser is not null)
+            {
+                SelectedUser.PropertyChanged -= User_PropertyChanged;
+            }
+
+            if(user is not null)
+            {
+                user.PropertyChanged += User_PropertyChanged;
+            }
+        }
+
+        private void User_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            SaveChanges();
         }
 
         public void RoleChanged()
@@ -118,6 +136,7 @@ namespace ObjectsManager.ViewModels
                 await MessageBoxManager.GetMessageBoxStandard(MessageBoxParamsHelper.GetErrorBoxParams($"Ошибка при удалении пользователя -> {e.Message}")).ShowAsync();
             }
         }
+
         public void SaveChanges()
         {
             try

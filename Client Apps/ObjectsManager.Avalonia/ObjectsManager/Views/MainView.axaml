@@ -7,9 +7,10 @@
              x:Class="ObjectsManager.Views.MainView"
 	         x:DataType="vm:MainViewModel"
 			 xmlns:gb="using:GroupBox.Avalonia.Controls"
-			 xmlns:th="using:Avalonia.Styling">
+			 xmlns:th="using:Avalonia.Styling"
+			 xmlns:cv="clr-namespace:ObjectsManager.Converters;assembly=ObjectsManager">
 	<UserControl.Resources>
-
+		<cv:ContextMenuItemsVisibilityConverter x:Key="ConMenuOpVisConv"/>
 	</UserControl.Resources>
 	<Grid  RowDefinitions="auto,*,auto">
 		<Menu x:Name="MainMenu" Background="{DynamicResource LightGrayBrush}">
@@ -77,20 +78,175 @@
 						</StackPanel>
 					</Border>
 				</gb:GroupBox.Header>
-				<Grid RowDefinitions="auto,*">
-					<StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
-						<Button Background="Transparent" Command="" ToolTip.Tip="Добавить запись">
-							<Image Width="30" Source="/Assets/ColorIcons/icons8-plus-100.png"/>
-						</Button>
-						<Image Margin="10,0,0,0" ToolTip.Tip="Фильтр по наименованию записи" Width="30" Source="/Assets/ColorIcons/icons8-search-100.png"/>
-						<TextBox HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="10,0,0,0" Width="150" ToolTip.Tip="Фильтр по наименованию записи" Text="{Binding FilterObj}"/>
-						<TextBlock VerticalAlignment="Center" Text="Глубина группировки:" Margin="20,0,0,0"/>
-						<NumericUpDown Minimum="0" FormatString="0" Margin="10,0,0,0" AllowSpin="True" Value="{Binding NumberOfGroups}"/>
-					</StackPanel>
-					<DataGrid x:Name="mainDataGrid" AutoGenerateColumns="False" CanUserReorderColumns="True" CanUserSortColumns="True" CanUserResizeColumns="True" GridLinesVisibility="Horizontal" Grid.Row="1">
+				<TabControl>
+					<TabItem Header="Записи">
+						<Grid RowDefinitions="auto,*">
+							<StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
+								<Button Background="Transparent" Command="{Binding AddItemCommand}" ToolTip.Tip="Добавить запись">
+									<Image Width="30" Source="/Assets/ColorIcons/icons8-plus-100.png"/>
+								</Button>
+								<Image Margin="10,0,0,0" ToolTip.Tip="Фильтр по наименованию записи" Width="30" Source="/Assets/ColorIcons/icons8-search-100.png"/>
+								<TextBox HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="10,0,0,0" Width="150" ToolTip.Tip="Фильтр по наименованию записи" Text="{Binding FilterItem}"/>
+								<TextBlock VerticalAlignment="Center" Text="Глубина группировки:" Margin="20,0,0,0"/>
+								<NumericUpDown Minimum="0" FormatString="0" Margin="10,0,0,0" AllowSpin="True" VerticalContentAlignment="Center" Value="{Binding NumberOfGroups}" ValueChanged="NumericUpDown_ValueChanged"/>
+								<Menu>
+									<MenuItem Margin="20,0,0,0" Header="Столбцы">
+										<CheckBox x:Name="ch1" Tag="1" IsChecked="True" Content="Наименование"/>
+										<CheckBox x:Name="ch2" Tag="2" IsChecked="True" Content="Единица измерения"/>
+										<CheckBox x:Name="ch3" Tag="3" IsChecked="True" Content="Количество закупленных единиц"/>
+										<CheckBox x:Name="ch4" Tag="4" IsChecked="True" Content="Цена за единицу"/>
+										<CheckBox x:Name="ch5" Tag="5" IsChecked="True" Content="Ожидаемый расход"/>
+										<CheckBox x:Name="ch6" Tag="6" IsChecked="True" Content="Фактический расход"/>
+										<CheckBox x:Name="ch7" Tag="7" IsChecked="True" Content="Перерасход"/>
+										<CheckBox x:Name="ch8" Tag="8" IsChecked="True" Content="Количетсво использованных единиц"/>
+										<CheckBox x:Name="ch9" Tag="9" IsChecked="True" Content="Остаток"/>
+										<CheckBox x:Name="ch10" Tag="10" IsChecked="True" Content="Производитель"/>
+									</MenuItem>
+								</Menu>
+								<Button Background="Transparent" Margin="20,0,0,0" Command="{Binding EditItemCommand}" ToolTip.Tip="Отредактировать выбранную запись">
+									<Image Width="30" Source="/Assets/ColorIcons/icons8-edit-pencil-100.png"/>
+								</Button>
+
+								<Button Background="Transparent" Command="{Binding DeleteItemCommand}" Margin="20,0,0,0">
+									<Image Width="30" Source="/Assets/ColorIcons/icons8-delete-100.png"/>
+								</Button>
+							</StackPanel>
+							<DataGrid x:Name="mainDataGrid"  AutoGenerateColumns="False" CanUserReorderColumns="True" CanUserSortColumns="True" CanUserResizeColumns="True" GridLinesVisibility="Horizontal" Grid.Row="1" ItemsSource="{Binding ItemsOfConObj}" SelectedItem="{Binding SelectedObjItem}" SelectionMode="Extended" SelectionChanged="DataGrid_SelectionChanged">
+								<DataGrid.ContextMenu>
+									<ContextMenu>
+										<MenuItem Header="Редактировать свойства группировки записи" Command="{Binding EditGroupingPropertiesOfItemCommand}" IsVisible="{Binding SelectedItemsOfConObj.Count, Converter={StaticResource ConMenuOpVisConv}}"/>
+										<MenuItem Header="Добавить свойства группировки выбранным записям" Command="{Binding AddGroupingPropToSelectedItemsCommand}" IsVisible="{Binding SelectedItemsOfConObj.Count, Converter={StaticResource ConMenuOpVisConv}, ConverterParameter=1}"/>
+										<MenuItem Header="Удалить свойства группировки у выбранных записей" Command="{Binding DeleteGroupingPropOfSelectedItemsCommand}" IsVisible="{Binding SelectedItemsOfConObj.Count, Converter={StaticResource ConMenuOpVisConv}, ConverterParameter=1}" />
+										<MenuItem Header="Задать свойства группировки для выбранных записей" Command="{Binding SetGroupingPropsOfSelectedItemsCommand}" IsVisible="{Binding SelectedItemsOfConObj.Count, Converter={StaticResource ConMenuOpVisConv}, ConverterParameter=1}" />
+										<Separator/>
+										<MenuItem Header="Дополнительная информация по записи" Command="{Binding OpenMetaDataWindowCommand}" IsVisible="{Binding SelectedItemsOfConObj.Count, Converter={StaticResource ConMenuOpVisConv}}" />
+									</ContextMenu>
+								</DataGrid.ContextMenu>
+								<DataGrid.Styles>
+									<Style Selector="DataGridCell">
+										<Setter Property="VerticalContentAlignment" Value="Center"/>
+									</Style>
+								</DataGrid.Styles>
+								<DataGrid.Columns>
+
+									<DataGridTemplateColumn IsVisible="{Binding IsChecked, ElementName=ch1}" SortMemberPath="SourceItem.NameItem.Name" Width="150">
+										<DataGridTemplateColumn.Header>
+											<TextBlock x:Name="nameColumn" Text="Наименование"/>
+										</DataGridTemplateColumn.Header>
+										<DataGridTemplateColumn.CellTemplate>
+											<DataTemplate x:DataType="vm:ItemWrapper">
+												<TextBlock Margin="5,0,0,0" Text="{Binding SourceItem.NameItem.Name}"/>
+											</DataTemplate>
+										</DataGridTemplateColumn.CellTemplate>
+									</DataGridTemplateColumn>
+
+									<DataGridTemplateColumn IsVisible="{Binding IsChecked, ElementName=ch2}" SortMemberPath="SourceItem.UnitType.Name" Width="100">
+										<DataGridTemplateColumn.Header>
+											<TextBlock x:Name="unitTypeColumn" Text="Ед. изм."/>
+										</DataGridTemplateColumn.Header>
+										<DataGridTemplateColumn.CellTemplate>
+											<DataTemplate x:DataType="vm:ItemWrapper">
+												<TextBlock Margin="5,0,0,0" Text="{Binding SourceItem.UnitType.Name}"/>
+											</DataTemplate>
+										</DataGridTemplateColumn.CellTemplate>
+									</DataGridTemplateColumn>
+
+									<DataGridTemplateColumn IsVisible="{Binding IsChecked, ElementName=ch3}" SortMemberPath="SourceItem.CountOfUnits" Width="130">
+										<DataGridTemplateColumn.Header>
+											<TextBlock x:Name="countColumn" Text="Кол-во закуп."/>
+										</DataGridTemplateColumn.Header>
+										<DataGridTemplateColumn.CellTemplate>
+											<DataTemplate x:DataType="vm:ItemWrapper">
+												<TextBlock Margin="5,0,0,0" Text="{Binding SourceItem.CountOfUnits}"/>
+											</DataTemplate>
+										</DataGridTemplateColumn.CellTemplate>
+									</DataGridTemplateColumn>
+
+									<DataGridTemplateColumn IsVisible="{Binding IsChecked, ElementName=ch4}" SortMemberPath="SourceItem.PricePerUnit" Width="110">
+										<DataGridTemplateColumn.Header>
+											<TextBlock x:Name="priceColumn" Text="Цена за ед."/>
+										</DataGridTemplateColumn.Header>
+										<DataGridTemplateColumn.CellTemplate>
+											<DataTemplate x:DataType="vm:ItemWrapper">
+												<TextBlock Margin="5,0,0,0" Text="{Binding SourceItem.PricePerUnit}"/>
+											</DataTemplate>
+										</DataGridTemplateColumn.CellTemplate>
+									</DataGridTemplateColumn>
+
+									<DataGridTemplateColumn IsVisible="{Binding IsChecked, ElementName=ch5}" SortMemberPath="SourceItem.ExpectedCost" Width="170">
+										<DataGridTemplateColumn.Header>
+											<TextBlock x:Name="expectedColumn" Text="Ожидаемый расход"/>
+										</DataGridTemplateColumn.Header>
+										<DataGridTemplateColumn.CellTemplate>
+											<DataTemplate x:DataType="vm:ItemWrapper">
+												<TextBlock Margin="5,0,0,0" Text="{Binding SourceItem.ExpectedCost}"/>
+											</DataTemplate>
+										</DataGridTemplateColumn.CellTemplate>
+									</DataGridTemplateColumn>
+
+									<DataGridTemplateColumn IsVisible="{Binding IsChecked, ElementName=ch6}" SortMemberPath="RealSpend" Width="170">
+										<DataGridTemplateColumn.Header>
+											<TextBlock x:Name="realCost" Text="Фактический расход"/>
+										</DataGridTemplateColumn.Header>
+										<DataGridTemplateColumn.CellTemplate>
+											<DataTemplate x:DataType="vm:ItemWrapper">
+												<TextBlock Margin="5,0,0,0" Text="{Binding RealSpend}"/>
+											</DataTemplate>
+										</DataGridTemplateColumn.CellTemplate>
+									</DataGridTemplateColumn>
+
+									<DataGridTemplateColumn IsVisible="{Binding IsChecked, ElementName=ch7}" SortMemberPath="Overspend" Width="120">
+										<DataGridTemplateColumn.Header>
+											<TextBlock x:Name="overSpend" Text="Перерасход"/>
+										</DataGridTemplateColumn.Header>
+										<DataGridTemplateColumn.CellTemplate>
+											<DataTemplate x:DataType="vm:ItemWrapper">
+												<TextBlock Margin="5,0,0,0" Text="{Binding Overspend}"/>
+											</DataTemplate>
+										</DataGridTemplateColumn.CellTemplate>
+									</DataGridTemplateColumn>
+
+									<DataGridTemplateColumn IsVisible="{Binding IsChecked, ElementName=ch8}" SortMemberPath="SourceItem.CountOfUsedUnits" Width="110">
+										<DataGridTemplateColumn.Header>
+											<TextBlock x:Name="countOfUsedColumn" Text="Кол-во исп."/>
+										</DataGridTemplateColumn.Header>
+										<DataGridTemplateColumn.CellTemplate>
+											<DataTemplate x:DataType="vm:ItemWrapper">
+												<TextBlock Margin="5,0,0,0" Text="{Binding SourceItem.CountOfUsedUnits}"/>
+											</DataTemplate>
+										</DataGridTemplateColumn.CellTemplate>
+									</DataGridTemplateColumn>
+
+									<DataGridTemplateColumn IsVisible="{Binding IsChecked, ElementName=ch9}" SortMemberPath="RemainsUnits" Width="110">
+										<DataGridTemplateColumn.Header>
+											<TextBlock x:Name="remainsColumn" Text="Остаток"/>
+										</DataGridTemplateColumn.Header>
+										<DataGridTemplateColumn.CellTemplate>
+											<DataTemplate x:DataType="vm:ItemWrapper">
+												<TextBlock Margin="5,0,0,0" Text="{Binding RemainsUnits}"/>
+											</DataTemplate>
+										</DataGridTemplateColumn.CellTemplate>
+									</DataGridTemplateColumn>
+
+									<DataGridTemplateColumn IsVisible="{Binding IsChecked, ElementName=ch10}" SortMemberPath="SourceItem.Producer.Name" Width="140">
+										<DataGridTemplateColumn.Header>
+											<TextBlock x:Name="producerColumn" Text="Производитель"/>
+										</DataGridTemplateColumn.Header>
+										<DataGridTemplateColumn.CellTemplate>
+											<DataTemplate x:DataType="vm:ItemWrapper">
+												<TextBlock Margin="5,0,0,0" Text="{Binding SourceItem.Producer.Name}"/>
+											</DataTemplate>
+										</DataGridTemplateColumn.CellTemplate>
+									</DataGridTemplateColumn>
+
+								</DataGrid.Columns>
+							</DataGrid>
+						</Grid>
+					</TabItem>
+					<TabItem Header="Расходы">
 						
-					</DataGrid>
-				</Grid>
+					</TabItem>
+				</TabControl>
 			</gb:GroupBox>
 		</Grid>
 		

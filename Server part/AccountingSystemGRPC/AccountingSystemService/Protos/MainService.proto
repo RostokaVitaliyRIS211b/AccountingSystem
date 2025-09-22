@@ -22,6 +22,7 @@ service AccountingSystem {
 	rpc GetAllProducers(.google.protobuf.Empty) returns (List_Producers);
 	rpc GetMetaDataOfItem(PInt) returns (List_MetaData);
 	rpc GetJournal(.google.protobuf.Empty) returns (ProtoJournal);
+	rpc GetAllMetaDataTypes(.google.protobuf.Empty) returns (List_MetaDataTypes);
 
 	rpc AddItem(ProtoItem) returns (PInt);
 	rpc UpdateItem(ProtoItem) returns (PBool);
@@ -53,7 +54,15 @@ service AccountingSystem {
 
 	rpc CheckActive(.google.protobuf.Empty) returns (.google.protobuf.Empty);
 
+	rpc SetGroupingPropertiesOfItem(ChangeGroupingPropertiesofItem) returns (PBool);
+
 }
+
+message ChangeGroupingPropertiesofItem{
+	List_GroupingProps props = 1;
+	int32 itemId = 2;
+}
+
 
 message ChangeGroupingPropertyofItem{
 	ProtoGroupingProperty prop = 1;
@@ -112,6 +121,10 @@ message List_TypeOfItems{
 	repeated ProtoTypeOfItem types = 1;
 }
 
+message List_MetaDataTypes{
+	repeated ProtoMetaDataType types = 1;
+}
+
 message ProtoUser{
 	int32 id = 1;
 	string name = 2;
@@ -142,6 +155,11 @@ message ProtoItemMetaData{
 	int32 itemId = 3;
 	bytes data = 4;
 	int32 typeId = 5;
+}
+
+message ProtoMetaDataType{
+	int32 id = 1;
+	string name = 2;
 }
 
 message ProtoGroupingProperty{
@@ -189,13 +207,13 @@ message ProtoItem{
 	int32 id = 1;
 	ProtoObject obj = 2;
 	ProtoTypeOfUnit unitType = 3;
-	int32 countOfUnits = 4;
-	int32 pricePerUnit = 5;
-	int32 ExpectedCost = 6;
+	double countOfUnits = 4;
+	double pricePerUnit = 5;
+	double ExpectedCost = 6;
 	ProtoProducer producer = 7;
 	string description = 8;
 	ProtoTypeOfItem type = 9;
 	ProtoNameItem nameItem = 10;
-	int32 countOfUsedUnits = 11;
+	double countOfUsedUnits = 11;
 }
 
