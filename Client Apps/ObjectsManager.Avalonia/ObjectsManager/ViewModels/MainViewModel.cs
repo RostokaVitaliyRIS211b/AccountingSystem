@@ -673,11 +673,6 @@ public partial class MainViewModel : ViewModelBase, IMainViewModel
         {
             CalculateTotals(root);
         }
-
-    public void Dispose()
-    {
-        Service.Dispose();
-    }
         ExpansesColl = new ObservableCollection<Expanses>(rootNodes);
 
         ExpansesSource = new HierarchicalTreeDataGridSource<Expanses>(ExpansesColl)
@@ -693,5 +688,11 @@ public partial class MainViewModel : ViewModelBase, IMainViewModel
             },
         };
     }
+
+    public void Dispose()
+    {
+        Service.Dispose();
+    }
+       
     #endregion
 }

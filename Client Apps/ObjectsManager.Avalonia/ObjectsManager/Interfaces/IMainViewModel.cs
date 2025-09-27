@@ -69,7 +69,6 @@ namespace ObjectsManager.Interfaces
         public abstract Task OpenObjectMetaDataWindow();
 
         public abstract Task OpenMetaDataWindow();
-        public Action FilterGrid { get; set; }
 
         public ObservableCollection<Expanses> ExpansesColl { get; set; }
         public HierarchicalTreeDataGridSource<Expanses> ExpansesSource { get; set; }
