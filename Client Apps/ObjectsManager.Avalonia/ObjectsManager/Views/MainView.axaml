@@ -55,6 +55,14 @@
 						<TextBox Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="10,0,0,0" ToolTip.Tip="Фильтр по имени объекта" Text="{Binding FilterObj}"/>
 					</Grid>
 					<ListBox Background="{DynamicResource WhiteBrush}" Grid.Row="1" ItemsSource="{Binding FilteredConObjects}" SelectedItem="{Binding SelectedObj}">
+						<ListBox.ContextMenu>
+							<ContextMenu>
+								<MenuItem Header="Экспортировать все записи" Command="{Binding SaveItemsOfObjectCommand}"/>
+								<MenuItem Header="Добавить записи из Excel" Command="{Binding LoadItemsToObjectCommand}"/>
+								<Separator/>
+								<MenuItem Header="Дополнительная информация по объекту" Command="{Binding OpenObjectMetaDataWindowCommand}"/>
+							</ContextMenu>
+						</ListBox.ContextMenu>
 						<ListBox.ItemTemplate>
 							<DataTemplate>
 								<StackPanel Orientation="Horizontal">

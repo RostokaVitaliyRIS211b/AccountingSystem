@@ -1,8 +1,11 @@
-﻿using GrpcServiceClient.DataContracts;
+﻿using Grpc.Core;
+
+using GrpcServiceClient.DataContracts;
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -504,6 +507,71 @@ namespace GrpcServiceClient
         {
             var reply = await Client.GetAllMetaDataTypesAsync(new Google.Protobuf.WellKnownTypes.Empty());
             return [.. reply.Types_.Select(x => new MetaDataType(x))];
+        }
+
+        public List<ObjectMetadata> GetAllObjectMetaData(int objectId)
+        {
+            var reply = Client.GetAllObjectMetaData(new PInt() { Val = objectId });
+            return [.. reply.Metadata.Select(x => new ObjectMetadata(x))];
+        }
+
+        public async Task<List<ObjectMetadata>> GetAllObjectMetaDataAsync(int objectId)
+        {
+            var reply = await Client.GetAllObjectMetaDataAsync(new PInt() { Val = objectId });
+            return [.. reply.Metadata.Select(x => new ObjectMetadata(x))];
+        }
+
+        public bool RemoveObjectMetadata(ObjectMetadata metadata)
+        {
+            var reply = Client.RemoveObjectMetadata(metadata.ProtoObject);
+            return reply.Val;
+        }
+
+        public async Task<bool> RemoveObjectMetadataAsync(ObjectMetadata metadata)
+        {
+            var reply = await Client.RemoveObjectMetadataAsync(metadata.ProtoObject);
+            return reply.Val;
+        }
+
+        public int AddObjectMetaData(ObjectMetadata metadata)
+        {
+            var reply = Client.AddObjectMetaData(metadata.ProtoObject);
+            return reply.Val;
+        }
+
+        public async Task<int> AddObjectMetaDataAsync(ObjectMetadata metadata)
+        {
+            var reply = await Client.AddObjectMetaDataAsync(metadata.ProtoObject);
+            return reply.Val;
+        }
+
+        public BackupStatusResponse GetBackupStatus()
+        {
+            var reply = Client.GetBackupStatus(new Google.Protobuf.WellKnownTypes.Empty());
+            return new BackupStatusResponse(reply);
+        }
+
+        public async Task<BackupStatusResponse> GetBackupStatusAsync()
+        {
+            var reply = await Client.GetBackupStatusAsync(new Google.Protobuf.WellKnownTypes.Empty());
+            return new BackupStatusResponse(reply);
+        }
+
+        public async IAsyncEnumerable<byte[]> StartBackupAsync([EnumeratorCancellation] CancellationToken ct = default)
+        {
+            var stream = Client.StartBackup(new Google.Protobuf.WellKnownTypes.Empty());
+
+            while (await stream.ResponseStream.MoveNext(ct))
+            {
+                var chunk = stream.ResponseStream.Current;
+
+                if (chunk.IsLast)
+                {
+                    break;
+                }
+
+                yield return chunk.Data.ToByteArray();
+            }
         }
     }
 }

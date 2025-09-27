@@ -45,16 +45,42 @@ service AccountingSystem {
 	rpc AddNameItem(ProtoNameItem) returns (PInt);
 	rpc AddTypeOfUnit(ProtoTypeOfUnit) returns (PInt);
 	rpc AddItemMetaData(ProtoItemMetaData) returns (PInt);
+	rpc AddObjectMetaData(ProtoObjectMetadata) returns (PInt);
 	rpc AddRecordToJournal(ProtoJournalRecord) returns (PBool);
 
 	rpc AddGroupingPropertyOfItem(ChangeGroupingPropertyofItem) returns (PBool);
 	rpc RemoveGroupingPropertyOfItem(ChangeGroupingPropertyofItem) returns (PBool);
 
 	rpc RemoveItemMetaData(ProtoItemMetaData) returns (PBool);
+	rpc RemoveObjectMetadata(ProtoObjectMetadata) returns (PBool);
 
 	rpc CheckActive(.google.protobuf.Empty) returns (.google.protobuf.Empty);
 
 	rpc SetGroupingPropertiesOfItem(ChangeGroupingPropertiesofItem) returns (PBool);
+
+	rpc GetAllObjectMetaData(PInt) returns (List_ProtoObjectMetadata);
+
+	rpc StartBackup(.google.protobuf.Empty) returns (stream ProtoBackupChunk);
+	rpc GetBackupStatus(.google.protobuf.Empty) returns (ProtoBackupStatusResponse);
+
+	rpc AddSessionData(.google.protobuf.Empty) returns (PBool);
+	rpc AbortSessionData(.google.protobuf.Empty) returns (.google.protobuf.Empty);
+}
+
+message StrMes{
+	string id =1;
+}
+
+message ProtoBackupChunk{
+	bool is_last =  1;
+	bytes data = 2;
+}
+
+message ProtoBackupStatusResponse {
+  bool is_done = 1;
+  string error_message = 2;
+  int32 file_size_in_8kb_chunks = 3;
+  bool is_in_process = 4;
 }
 
 message ChangeGroupingPropertiesofItem{
@@ -123,6 +149,10 @@ message List_MetaDataTypes{
 	repeated ProtoMetaDataType types = 1;
 }
 
+message List_ProtoObjectMetadata{
+	repeated ProtoObjectMetadata metadata = 1;
+}
+
 message ProtoUser{
 	int32 id = 1;
 	string name = 2;
@@ -151,6 +181,14 @@ message ProtoItemMetaData{
 	int32 id = 1;
 	string name = 2;
 	int32 itemId = 3;
+	bytes data = 4;
+	int32 typeId = 5;
+}
+
+message ProtoObjectMetadata{
+	int32 id = 1;
+	string name = 2;
+	int32 objId = 3;
 	bytes data = 4;
 	int32 typeId = 5;
 }

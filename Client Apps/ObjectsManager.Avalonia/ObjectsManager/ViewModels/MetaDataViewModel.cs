@@ -54,15 +54,26 @@ namespace ObjectsManager.ViewModels
 
         public IEnumerable<TabItem> SetTabItems(TabControl tabControl)
         {
-            this.MainTabControl = tabControl;
             var result = new List<TabItem>();
-            var metaData = Service.GetMetaDataOfItem(Wrapper.SourceItem.Id);
-            var types = Service.GetAllMetaDataTypes();
-            AllMetaDataTypes = [.. types];
-            foreach ( var item in metaData)
+            this.MainTabControl = tabControl;
+
+
+            try
             {
-                AddMetaDataToTabCtrl(item);
+                var metaData = Service.GetMetaDataOfItem(Wrapper.SourceItem.Id);
+                var types = Service.GetAllMetaDataTypes();
+                AllMetaDataTypes = [.. types];
+                foreach (var item in metaData)
+                {
+                    AddMetaDataToTabCtrl(item);
+                }
             }
+            catch (Exception e)
+            {
+                _ = MessageBoxManager.GetMessageBoxStandard(MessageBoxParamsHelper.GetErrorBoxParams($"Ошибка при загрузке метаданных записи -> {e.Message}")).ShowAsync();
+                Win?.Close();
+            }
+
             return result;
         }
 

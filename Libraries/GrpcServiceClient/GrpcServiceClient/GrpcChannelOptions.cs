@@ -21,6 +21,7 @@ namespace GrpcServiceClient
             var reply3 = service.Authentificate(new AuthRequest() { Password = password, Username = username });
             HttpClient httpClientWithAuth = new HttpClient();
             httpClientWithAuth.DefaultRequestHeaders.Add("Authorization", $"Bearer {reply3.Token}");
+            httpClientWithAuth.DefaultRequestHeaders.Add("Id",Guid.NewGuid().ToString());
             GrpcChannelOptions options = new()
             {
                 HttpClient = httpClientWithAuth,

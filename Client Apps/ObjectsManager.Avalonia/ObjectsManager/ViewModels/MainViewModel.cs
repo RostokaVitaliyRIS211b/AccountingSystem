@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
+using ObjectsManager.Core;
 
 namespace ObjectsManager.ViewModels;
 
@@ -123,11 +124,15 @@ public partial class MainViewModel : ViewModelBase, IMainViewModel
 
 
     private string? itemFilter = "";
-    public string? FilterItem { get => itemFilter; set { itemFilter = value; OnPropertyChanged(nameof(FilterItem)); FilterGrid.Invoke(); } }
+    public string? FilterItem { get => itemFilter; set { itemFilter = value; OnPropertyChanged(nameof(FilterItem)); FilterGrid?.Invoke(); } }
 
     public Func<IEnumerable<ItemWrapper>>? GetSelectedItems { get; set; }
 
-    public Action FilterGrid { get; set; }
+    public Action? FilterGrid { get; set; }
+
+    public Interaction<object?, string?> LoadItems { get; } = new();
+
+    public Interaction<object?, string?> SaveItems { get; } = new();
 
     #endregion
 
@@ -403,7 +408,7 @@ public partial class MainViewModel : ViewModelBase, IMainViewModel
                         if (await Service.SetGroupingPropertiesOfItemAsync([.. dataContext.SelectedProps], item.SourceItem.Id))
                         {
                             item.GroupingProperties.Clear();
-                            foreach(var prop in dataContext.SelectedProps)
+                            foreach (var prop in dataContext.SelectedProps)
                             {
                                 item.GroupingProperties.Add(prop);
                             }
@@ -425,13 +430,13 @@ public partial class MainViewModel : ViewModelBase, IMainViewModel
 
         try
         {
-            if(SelectedObjItem != null)
+            if (SelectedObjItem != null)
             {
                 var dataContext = new MetaDataViewModel(SelectedObjItem, Service);
                 var window = new MetaDataWindow(dataContext);
                 window.Title += $"{SelectedObjItem.SourceItem.NameItem?.Name}";
 
-                if(Win is not null)
+                if (Win is not null)
                 {
                     await window.ShowDialog(Win);
                 }
@@ -445,7 +450,103 @@ public partial class MainViewModel : ViewModelBase, IMainViewModel
     }
 
 
+    [RelayCommand]
+    public async Task LoadItemsToObject()
+    {
+
+        try
+        {
+            if (SelectedObj is null)
+            {
+                await MessageBoxManager.GetMessageBoxStandard(MessageBoxParamsHelper.GetErrorBoxParams($"Выберите объект!")).ShowAsync();
+                return;
+            }
+
+            var path = await LoadItems.HandleAsync(null);
+
+            var items = await ExcelSerializatorHelper.LoadExcelFile(path, Service, SelectedObj, TypesOfItems.ToList(), Names.ToList(), TypesOfUnits.ToList(), Producers.ToList()) ?? throw new Exception("Items not loaded");
+
+
+            var selected = SelectedObj;
+            SelectedObj = null;
+            SelectedObj = selected;
+
+
+
+            await MessageBoxManager.GetMessageBoxStandard(MessageBoxParamsHelper.GetSuccessBoxParams($"Записи успешно загружены")).ShowAsync();
+        }
+        catch (Exception e)
+        {
+            await MessageBoxManager.GetMessageBoxStandard(MessageBoxParamsHelper.GetErrorBoxParams($"Ошибка при загрузке записей -> {e.Message}")).ShowAsync();
+        }
+
+    }
+
+
+    [RelayCommand]
+    public async Task SaveItemsOfObject()
+    {
+        try
+        {
+            if (SelectedObj is null)
+            {
+                await MessageBoxManager.GetMessageBoxStandard(MessageBoxParamsHelper.GetErrorBoxParams($"Выберите объект!")).ShowAsync();
+                return;
+            }
+
+            var path = await SaveItems.HandleAsync(null);
+
+            var exception = ExcelSerializatorHelper.SaveAsExcelTable(path, SelectedObj, ItemsOfConObj.ToList());
+
+            if (exception != null)
+            {
+                await MessageBoxManager.GetMessageBoxStandard(MessageBoxParamsHelper.GetErrorBoxParams($"Ошибка при сохранении записей в файл -> {exception.Message}")).ShowAsync();
+                return;
+            }
+            else
+            {
+                await MessageBoxManager.GetMessageBoxStandard(MessageBoxParamsHelper.GetSuccessBoxParams($"Записи успешно сохранены")).ShowAsync();
+            }
+        }
+        catch (Exception e)
+        {
+            await MessageBoxManager.GetMessageBoxStandard(MessageBoxParamsHelper.GetErrorBoxParams($"Ошибка при сохранении записей -> {e.Message}")).ShowAsync();
+        }
+
+    }
+
+
+    [RelayCommand]
+    public async Task OpenObjectMetaDataWindow()
+    {
+        try
+        {
+            if (SelectedObj is null)
+            {
+                await MessageBoxManager.GetMessageBoxStandard(MessageBoxParamsHelper.GetErrorBoxParams($"Выберите объект!")).ShowAsync();
+                return;
+            }
+
+            var dataContext = new ObjectMetaDataViewModel(SelectedObj, Service);
+            var window = new MetaDataWindow(dataContext);
+
+            window.Title = $"Дополнительная информация по объекту: {SelectedObj.Name}";
+
+            if(Win is not null)
+            {
+                await window.ShowDialog(Win);
+            }
+        }
+        catch (Exception e)
+        {
+            await MessageBoxManager.GetMessageBoxStandard(MessageBoxParamsHelper.GetErrorBoxParams($"Ошибка при открытии окна Дополнительная информация по объекту -> {e.Message}")).ShowAsync();
+        }
+    }
+
+
     #endregion
+
+    #region OtherMethods
 
     public bool FilteringItem(object item)
     {
@@ -505,5 +606,10 @@ public partial class MainViewModel : ViewModelBase, IMainViewModel
         }
     }
 
+    public void Dispose()
+    {
+        Service.Dispose();
+    }
 
+    #endregion
 }

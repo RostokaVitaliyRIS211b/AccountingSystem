@@ -10,4 +10,6 @@ public partial class TypesOfMetaDatum
     public string? Name { get; set; }
 
     public virtual ICollection<ItemMetaDatum> ItemMetaData { get; set; } = new List<ItemMetaDatum>();
+
+    public virtual ICollection<ObjectMetaDatum> ObjectMetaData { get; set; } = new List<ObjectMetaDatum>();
 }

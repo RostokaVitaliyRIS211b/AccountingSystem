@@ -14,4 +14,6 @@ public partial class Object
     public string Address { get; set; } = null!;
 
     public virtual ICollection<Item> Items { get; set; } = new List<Item>();
+
+    public virtual ICollection<ObjectMetaDatum> ObjectMetaData { get; set; } = new List<ObjectMetaDatum>();
 }

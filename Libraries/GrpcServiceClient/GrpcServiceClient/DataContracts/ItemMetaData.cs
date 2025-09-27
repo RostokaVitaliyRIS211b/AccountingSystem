@@ -59,7 +59,7 @@ namespace GrpcServiceClient.DataContracts
 
         public byte[] Data
         {
-            get => ProtoObject.Data?.ToArray() ?? Array.Empty<byte>();
+            get => ProtoObject.Data?.ToByteArray() ?? [];
             set
             {
                 ProtoObject.Data = ByteString.CopyFrom(value);

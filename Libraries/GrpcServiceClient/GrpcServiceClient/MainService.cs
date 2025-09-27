@@ -19,6 +19,14 @@ namespace GrpcServiceClient
             Address = address;
             Username = name;
             Password = password;
+            try
+            {
+                Client.AddSessionData(new Google.Protobuf.WellKnownTypes.Empty());
+            }
+            catch
+            {
+               
+            }
         }
 
         private GrpcChannel Channel { get; }
@@ -33,6 +41,14 @@ namespace GrpcServiceClient
 
         public void Dispose()
         {
+            try
+            {
+                Client.AbortSessionData(new Google.Protobuf.WellKnownTypes.Empty());
+            }
+            catch
+            {
+
+            }
             Channel.Dispose();
         }
     }

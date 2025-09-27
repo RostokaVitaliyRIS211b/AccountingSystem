@@ -6,6 +6,7 @@ namespace BdClasses;
 
 public partial class ConstructionContext : DbContext
 {
+
     public ConstructionContext(DbContextOptions<ConstructionContext> options)
         : base(options)
     {
@@ -24,6 +25,8 @@ public partial class ConstructionContext : DbContext
     public virtual DbSet<NameItem> NameItems { get; set; }
 
     public virtual DbSet<Object> Objects { get; set; }
+
+    public virtual DbSet<ObjectMetaDatum> ObjectMetaData { get; set; }
 
     public virtual DbSet<Permission> Permissions { get; set; }
 
@@ -49,12 +52,13 @@ public partial class ConstructionContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("GroupingPropertiesForItems_pkey");
 
+            entity.HasIndex(e => e.ItemId, "fki_itemFkKey");
+
             entity.Property(e => e.Id).UseIdentityAlwaysColumn();
 
             entity.HasOne(d => d.Item).WithMany(p => p.GroupingPropertiesForItems)
                 .HasForeignKey(d => d.ItemId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("itemIdKKeyGProps");
+                .HasConstraintName("itemFkKey");
 
             entity.HasOne(d => d.Prop).WithMany(p => p.GroupingPropertiesForItems)
                 .HasForeignKey(d => d.PropId)
@@ -145,6 +149,19 @@ public partial class ConstructionContext : DbContext
             entity.HasKey(e => e.Id).HasName("Objects_pkey");
 
             entity.Property(e => e.Id).UseIdentityAlwaysColumn();
+        });
+
+        modelBuilder.Entity<ObjectMetaDatum>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("pr");
+
+            entity.HasOne(d => d.DataType).WithMany(p => p.ObjectMetaData)
+                .HasForeignKey(d => d.DataTypeId)
+                .HasConstraintName("fkDataTypeID");
+
+            entity.HasOne(d => d.Object).WithMany(p => p.ObjectMetaData)
+                .HasForeignKey(d => d.ObjectId)
+                .HasConstraintName("fkObj");
         });
 
         modelBuilder.Entity<Permission>(entity =>

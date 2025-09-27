@@ -16,6 +16,7 @@
     <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.5" />
     <PackageReference Include="AvaloniaComponents.MetaDataView" Version="1.0.0" />
     <PackageReference Include="BinToss.GroupBox.Avalonia" Version="1.0.0" />
+    <PackageReference Include="ClosedXML" Version="0.105.0" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
 
     <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->

@@ -3,6 +3,7 @@ using Avalonia.Styling;
 
 using GrpcServiceClient.DataContracts;
 
+using ObjectsManager.Core;
 using ObjectsManager.ViewModels;
 
 using System;
@@ -14,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace ObjectsManager.Interfaces
 {
-    public interface IMainViewModel
+    public interface IMainViewModel:IDisposable
     {
         public string SelectedObjName { get; set; }
         public ConObject? SelectedObj { get; set; }
@@ -55,6 +56,18 @@ namespace ObjectsManager.Interfaces
 
         public Func<IEnumerable<ItemWrapper>>? GetSelectedItems { get; set; }
 
-        public Action FilterGrid { get; set; }
+        public Action? FilterGrid { get; set; }
+
+        public Interaction<object?, string?> LoadItems { get; } 
+
+        public Interaction<object?, string?> SaveItems { get; }
+
+        public abstract Task LoadItemsToObject();
+
+        public abstract Task SaveItemsOfObject();
+
+        public abstract Task OpenObjectMetaDataWindow();
+
+        public abstract Task OpenMetaDataWindow();
     }
 }

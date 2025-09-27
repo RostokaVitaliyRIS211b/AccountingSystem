@@ -6,12 +6,16 @@ using AccountingSystemService.Wrappers;
 
 using BdClasses;
 
+using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
 
 using Grpc.Core;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
+
+using System.ComponentModel;
+using System.Diagnostics;
 
 namespace AccountingSystemService.Services
 {
@@ -22,12 +26,55 @@ namespace AccountingSystemService.Services
         private UsersCollection usrColl { get; }
         private ObjectCollection objColl { get; }
         private ConstructionContext db { get; set; }
+
+        private static object LockObj { get; } = new();
+
+        private static string ErrorMessage { get; set; } = "";
+
+        private static bool IsBackupDone { get; set; } = false;
+
+        private static string BackupFilePath { get; set; } = "";
+
+        private static bool IsBackupInProcess { get; set; } = false;
+
         public AccountingService(IErrorHandler errorHandler, UsersCollection usersCollection, ObjectCollection objectCollection, ConstructionContext db)
         {
             ErrorHandler = errorHandler;
             usrColl = usersCollection;
             objColl = objectCollection;
             this.db = db;
+        }
+
+        #region Adders
+
+        [Authorize(Roles = "37")]
+        public override Task<PInt> AddObjectMetaData(ProtoObjectMetadata request, ServerCallContext context)
+        {
+            PInt result = new PInt() { Val = -1 };
+            try
+            {
+                var metaData = new ObjectMetaDatum()
+                {
+                    Data = request.Data.ToByteArray(),
+                    DataTypeId = request.TypeId,
+                    Name = request.Name,
+                    ObjectId = request.ObjId,
+                };
+
+                var db = DbContextHelper.GetConstructionContext();
+                db.ObjectMetaData.Add(metaData);
+                db.SaveChanges();
+
+                result.Val = metaData.Id;
+
+                ErrorHandler.HandleError($"Добавлены метаданные объекту {request.ObjId}", Severity.Information);
+            }
+            catch (Exception e)
+            {
+                result.Val = -1;
+                ErrorHandler.HandleError($"Ошибка при добавлении метаданных объекту {request.Id} -> {e.Message}", Severity.Error);
+            }
+            return Task.FromResult(result);
         }
 
         [Authorize(Roles = "27")]
@@ -221,6 +268,98 @@ namespace AccountingSystemService.Services
                 ErrorHandler.HandleError($"Ошибка при добавлении пользователя {request.Name} -> {e.Message}", Severity.Error);
             }
             return Task.FromResult(result);
+        }
+
+        #endregion
+
+        #region Getters
+
+        public override Task<List_MetaDataTypes> GetAllMetaDataTypes(Empty request, ServerCallContext context)
+        {
+            List_MetaDataTypes dataTypes = new();
+            try
+            {
+                var db = DbContextHelper.GetConstructionContext();
+                foreach (var type in db.TypesOfMetaData.ToList())
+                {
+                    dataTypes.Types_.Add(new ProtoMetaDataType() { Id = type.Id, Name = type.Name });
+                }
+            }
+            catch (Exception e)
+            {
+                ErrorHandler.HandleError($"Ошибка при получении всех типов метаданных {e.Message}", Severity.Error);
+            }
+            return Task.FromResult(dataTypes);
+        }
+
+        [Authorize(Roles = "36")]
+        public override Task<List_ProtoObjectMetadata> GetAllObjectMetaData(PInt request, ServerCallContext context)
+        {
+            var result = new List_ProtoObjectMetadata();
+            try
+            {
+                var db = DbContextHelper.GetConstructionContext();
+                var metadata = db.ObjectMetaData.AsNoTracking().Where(x => x.ObjectId == request.Val).ToList();
+                foreach (var meta in metadata)
+                {
+                    var met = new ObjectMetaDataWrapper()
+                    {
+                        Id = meta.Id,
+                        Name = meta.Name,
+                        TypeId = meta.DataTypeId,
+                        ObjId = meta.ObjectId,
+                        Data = meta.Data
+                    };
+                    result.Metadata.Add(met.ProtoObject);
+                }
+
+                ErrorHandler.HandleError($"Метаданные объекта {request.Val} получены", Severity.Information);
+            }
+            catch (Exception e)
+            {
+                ErrorHandler.HandleError($"Ошибка при получении метаданных объекта {request.Val} -> {e.Message}", Severity.Error);
+            }
+            return Task.FromResult(result);
+        }
+
+        public override Task<List_TypeOfItems> GetAllTypesOfItems(Empty request, ServerCallContext context)
+        {
+            List_TypeOfItems res = new();
+            try
+            {
+                var types = db.TypeOfItems.AsNoTracking().ToList();
+                foreach (var type in types)
+                {
+                    var pType = new TypeOfItemWrapper();
+                    pType.Name = type.Name;
+                    pType.Id = type.Id;
+                    res.Types_.Add(pType.ProtoObject);
+                }
+            }
+            catch (Exception e)
+            {
+                ErrorHandler.HandleError($"Ошибка при получении списка типов записей -> {e.Message}", Severity.Error);
+            }
+            return Task.FromResult(res);
+
+        }
+
+        [Authorize(Roles = "35")]
+        public override Task<List_Permissions> GetAllPermissions(Empty request, ServerCallContext context)
+        {
+            var res = new List_Permissions();
+            try
+            {
+                foreach (var item in usrColl.GetAllPermissions())
+                {
+                    res.Permissions.Add(item);
+                }
+            }
+            catch (Exception e)
+            {
+                ErrorHandler.HandleError($"Ошибка при получении списка разрешений -> {e.Message}", Severity.Error);
+            }
+            return Task.FromResult(res);
         }
 
         [Authorize(Roles = "26")]
@@ -436,6 +575,34 @@ namespace AccountingSystemService.Services
             return Task.FromResult(list);
         }
 
+        #endregion
+
+        #region Removers
+
+        [Authorize(Roles = "37")]
+        public override Task<PBool> RemoveObjectMetadata(ProtoObjectMetadata request, ServerCallContext context)
+        {
+            PBool p = new() { Val = false };
+            try
+            {
+                var db = DbContextHelper.GetConstructionContext();
+                var metadata = db.ObjectMetaData.FirstOrDefault(x => x.Id == request.Id);
+                if (metadata != null)
+                {
+                    db.ObjectMetaData.Remove(metadata);
+                    db.SaveChanges();
+                    p.Val = true;
+
+                    ErrorHandler.HandleError($"Метаданные {request.Name} объекта {request.Id} удалены", Severity.Information);
+                }
+            }
+            catch (Exception e)
+            {
+                ErrorHandler.HandleError($"Ошибка при удалении метаданных объекта {request.ObjId} / {request.Id} -> {e.Message}", Severity.Error);
+            }
+            return Task.FromResult(p);
+        }
+
         [Authorize(Roles = "15")]
         public override Task<PBool> RemoveGroupingPropertyOfItem(ChangeGroupingPropertyofItem request, ServerCallContext context)
         {
@@ -538,6 +705,10 @@ namespace AccountingSystemService.Services
             return Task.FromResult(result);
         }
 
+        #endregion
+
+        #region Updaters
+
         [Authorize(Roles = "15")]
         public override Task<PBool> UpdateItem(ProtoItem request, ServerCallContext context)
         {
@@ -603,49 +774,13 @@ namespace AccountingSystemService.Services
             return Task.FromResult(result);
         }
 
-        [Authorize(Roles = "35")]
-        public override Task<List_Permissions> GetAllPermissions(Empty request, ServerCallContext context)
-        {
-            var res = new List_Permissions();
-            try
-            {
-                foreach (var item in usrColl.GetAllPermissions())
-                {
-                    res.Permissions.Add(item);
-                }
-            }
-            catch (Exception e)
-            {
-                ErrorHandler.HandleError($"Ошибка при получении списка разрешений -> {e.Message}", Severity.Error);
-            }
-            return Task.FromResult(res);
-        }
+        #endregion
+
+        #region Other
 
         public override Task<Empty> CheckActive(Empty request, ServerCallContext context)
         {
             return Task.FromResult(new Empty());
-        }
-
-        public override Task<List_TypeOfItems> GetAllTypesOfItems(Empty request, ServerCallContext context)
-        {
-            List_TypeOfItems res = new();
-            try
-            {
-                var types = db.TypeOfItems.AsNoTracking().ToList();
-                foreach (var type in types)
-                {
-                    var pType = new TypeOfItemWrapper();
-                    pType.Name = type.Name;
-                    pType.Id = type.Id;
-                    res.Types_.Add(pType.ProtoObject);
-                }
-            }
-            catch (Exception e)
-            {
-                ErrorHandler.HandleError($"Ошибка при получении списка типов записей -> {e.Message}", Severity.Error);
-            }
-            return Task.FromResult(res);
-
         }
 
         [Authorize(Roles = "15")]
@@ -656,24 +791,24 @@ namespace AccountingSystemService.Services
             try
             {
                 var db = DbContextHelper.GetConstructionContext();
-                var propsOfItem = db.GroupingPropertiesForItems.AsNoTracking().Where(x=>x.ItemId == request.ItemId).ToList();
-                foreach(var prop in propsOfItem)
+                var propsOfItem = db.GroupingPropertiesForItems.AsNoTracking().Where(x => x.ItemId == request.ItemId).ToList();
+                foreach (var prop in propsOfItem)
                 {
                     db.GroupingPropertiesForItems.Remove(prop);
                 }
 
                 db.SaveChanges();
 
-                ErrorHandler.HandleError($"Свойства группировки записи {request.ItemId}  удалены",Severity.Information);
+                ErrorHandler.HandleError($"Свойства группировки записи {request.ItemId}  удалены", Severity.Information);
 
-                foreach(var prop in request.Props.Props)
+                foreach (var prop in request.Props.Props)
                 {
                     var gg = new GroupingPropertiesForItem();
                     gg.PropId = prop.Id;
                     gg.ItemId = request.ItemId;
                     db.GroupingPropertiesForItems.Add(gg);
                 }
-                
+
                 db.SaveChanges();
 
                 ErrorHandler.HandleError($"Свойства группировки записи {request.ItemId} добавлены", Severity.Information);
@@ -687,22 +822,211 @@ namespace AccountingSystemService.Services
             return Task.FromResult(result);
         }
 
-        public override Task<List_MetaDataTypes> GetAllMetaDataTypes(Empty request, ServerCallContext context)
+        [Authorize(Roles = "38")]
+        public override async Task StartBackup(Empty request, IServerStreamWriter<ProtoBackupChunk> responseStream, ServerCallContext context)
         {
-            List_MetaDataTypes dataTypes = new();
             try
             {
-                var db = DbContextHelper.GetConstructionContext();
-                foreach(var type in db.TypesOfMetaData.ToList())
+                //TODO нужно для каждого клиента сделать хуету для сохранения данных сессии возможно как нибудь хз как
+                lock (LockObj)
                 {
-                    dataTypes.Types_.Add(new ProtoMetaDataType() {Id = type.Id, Name = type.Name });
+                    if (IsBackupInProcess)
+                    {
+                        ErrorHandler.HandleError($"Бэкап уже выполняется. Запрос отклонён.", Severity.Warning);
+                        ErrorMessage = "Бэкап уже выполняется. Подождите завершения текущего бэкапа.";
+                        return;
+                    }
+
+                    BackupFilePath = "";
+                    ErrorMessage = "";
+                    IsBackupDone = false;
+                    IsBackupInProcess = true;
+                }
+
+                var backupId = Guid.NewGuid();
+                var backupFilePath = Path.Combine(DbContextHelper.BackupDir, $"{backupId}.backup");
+
+                ErrorHandler.HandleError($"Начато создание бэкапа базы", Severity.Information);
+
+                var process = new Process
+                {
+                    StartInfo = new ProcessStartInfo
+                    {
+                        FileName = DbContextHelper.PgDumpPath,
+                        Arguments = $"-h localhost -p 5432 -U {DbContextHelper.Username} -d {DbContextHelper.DatabaseName} -F c -f \"{backupFilePath}\"",
+                        UseShellExecute = false,
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true,
+                        CreateNoWindow = true,
+                        EnvironmentVariables =
+                        {
+                            ["PGPASSWORD"] = DbContextHelper.Password
+                        }
+
+                    }
+                };
+
+                process.Start();
+
+                await process.WaitForExitAsync();
+
+                if (process.ExitCode != 0)
+                {
+                    var error = await process.StandardError.ReadToEndAsync();
+                    throw new InvalidOperationException($"pg_dump failed with exit code {process.ExitCode}: {error}");
+                }
+
+                BackupFilePath = backupFilePath;
+
+                ErrorHandler.HandleError($"Бэкап создан {backupFilePath}", Severity.Information);
+
+
+                using var fileStream = File.OpenRead(backupFilePath);
+                var buffer = new byte[8192];
+                int bytesRead = 0;
+
+                while ((bytesRead = await fileStream.ReadAsync(buffer, context.CancellationToken)) > 0)
+                {
+
+                    await responseStream.WriteAsync(new ProtoBackupChunk
+                    {
+                        Data = ByteString.CopyFrom(buffer, 0, bytesRead),
+                        IsLast = false
+                    }, context.CancellationToken);
+                }
+
+
+                await responseStream.WriteAsync(new ProtoBackupChunk
+                {
+                    Data = ByteString.Empty,
+                    IsLast = true
+                }, context.CancellationToken);
+
+                IsBackupDone = true;
+                IsBackupInProcess = false;
+
+                ErrorHandler.HandleError($"Успешный бэкап базы", Severity.Information);
+            }
+            catch (OperationCanceledException)
+            {
+                ErrorMessage = "Бэкап отменён клиентом.";
+                ErrorHandler.HandleError("Бэкап отменён клиентом.",Severity.Information);
+            }
+            catch (Exception e)
+            {
+                IsBackupDone = false;
+                ErrorMessage = e.Message;
+                ErrorHandler.HandleError($"Ошибка при бэкапе базы -> {e.Message}", Severity.Error);
+            }
+            finally
+            {
+                lock (LockObj)
+                {
+                    ErrorMessage = "";
+                    if (!string.IsNullOrEmpty(BackupFilePath) && File.Exists(BackupFilePath))
+                    {
+                        try
+                        {
+                            File.Delete(BackupFilePath);
+
+                            ErrorHandler.HandleError($"Временный файл удален", Severity.Information);
+                        }
+                        catch (Exception e)
+                        {
+                            ErrorHandler.HandleError($"Ошибка при удалении временного файла -> {e.Message}", Severity.Error);
+                        }
+                    }
+
+                    BackupFilePath = "";
+
+                    IsBackupInProcess = false;
+                }
+
+            }
+
+        }
+
+        [Authorize(Roles = "38")]
+        public override Task<ProtoBackupStatusResponse> GetBackupStatus(Empty request, ServerCallContext context)
+        {
+            lock (LockObj)
+            {
+                ProtoBackupStatusResponse status = new()
+                {
+                    ErrorMessage = ErrorMessage,
+                    IsDone = IsBackupDone,
+                    FileSizeIn8KbChunks = 0,
+                    IsInProcess = IsBackupInProcess
+                };
+
+                if (File.Exists(BackupFilePath))
+                {
+                    var fileInfo = new FileInfo(BackupFilePath);
+                    int size = 0;
+                    try
+                    {
+                        size = (int)(fileInfo.Length / 8192);
+                    }
+                    catch
+                    {
+
+                    }
+                    status.FileSizeIn8KbChunks = size;
+                }
+                return Task.FromResult(status);
+            }
+        }
+
+        public override Task<Empty> AbortSessionData(Empty request, ServerCallContext context)
+        {
+            var id = context.RequestHeaders.Get("Id")?.Value;
+            try
+            {
+                
+                if(id is not null && SessionDataManager.TryRemoveUser(id))
+                {
+                    ErrorHandler.HandleError($"Данные сессии пользователя успешно удалены", Severity.Information);
+                }
+                else
+                {
+                    ErrorHandler.HandleError($"Данные сессии пользователя не удалены", Severity.Warning);
                 }
             }
             catch (Exception e)
             {
-                ErrorHandler.HandleError($"Ошибка при получении всех типов метаданных {e.Message}", Severity.Error);
+                ErrorHandler.HandleError($"Ошибка при удалении данных сессии пользователя {id} -> {e.Message} ", Severity.Error);
             }
-            return Task.FromResult(dataTypes);
+            return Task.FromResult(new Empty());
         }
+
+        public override Task<PBool> AddSessionData(Empty request, ServerCallContext context)
+        {
+            var id = context.RequestHeaders.Get("Id")?.Value;
+            var result = new PBool() { Val = false };
+            try
+            {
+
+                if (id is not null)
+                {
+                    result.Val = SessionDataManager.TryAddUser(id);
+                    if (result.Val)
+                    {
+                        ErrorHandler.HandleError($"Данные сессии для пользователя были добавлены", Severity.Information);
+                    }
+                    else
+                    {
+                        ErrorHandler.HandleError($"Данные сессии для пользователя не были добавлены", Severity.Warning);
+                    }
+                }
+                
+            }
+            catch (Exception e)
+            {
+                ErrorHandler.HandleError($"Ошибка при добавлении данных сессии пользователя {id} -> {e.Message} ", Severity.Error);
+            }
+            return Task.FromResult(result);
+        }
+
+        #endregion
     }
 }

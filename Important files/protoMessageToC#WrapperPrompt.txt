@@ -1,0 +1,398 @@
+Слушай мне нужно сделать обертки для сообщений из proto файла в C# класс вот некоторые примеры для понимания:
+
+Исходное сообщение :
+
+message ProtoItem{
+	int32 id = 1;
+	ProtoObject obj = 2;
+	ProtoTypeOfUnit unitType = 3;
+	double countOfUnits = 4;
+	double pricePerUnit = 5;
+	double ExpectedCost = 6;
+	ProtoProducer producer = 7;
+	string description = 8;
+	ProtoTypeOfItem type = 9;
+	ProtoNameItem nameItem = 10;
+	double countOfUsedUnits = 11;
+}
+
+Обертка на языке C# :
+
+public sealed partial class Item : INotifyPropertyChanged
+{
+    public Item()
+    {
+        ProtoObject = new ProtoItem();
+        ProtoObject.Obj = new();
+        ProtoObject.UnitType = new();
+        ProtoObject.Producer = new();
+        ProtoObject.Type = new();
+        ProtoObject.NameItem = new();
+    }
+
+    internal Item(ProtoItem proto)
+    {
+        ProtoObject = proto ?? new ProtoItem();
+
+        if (ProtoObject.Obj != null)
+            obj = new ConObject(ProtoObject.Obj);
+        else
+        {
+            ProtoObject.Obj = new();
+        }
+
+        if (ProtoObject.UnitType != null)
+            unitType = new TypeOfUnit(ProtoObject.UnitType);
+        else
+        {
+            ProtoObject.UnitType = new();
+        }
+
+        if (ProtoObject.Producer != null)
+            producer = new Producer(ProtoObject.Producer);
+        else
+        {
+            ProtoObject.Producer = new();
+        }
+
+        if (ProtoObject.Type != null)
+            type = new TypeOfItem(ProtoObject.Type);
+        else
+        {
+            ProtoObject.Type = new();
+        }
+
+        if (ProtoObject.NameItem != null)
+            nameItem = new NameItem(ProtoObject.NameItem);
+        else
+        {
+            ProtoObject.NameItem = new();
+        }
+    }
+
+    #region ProtoFields
+
+    internal ProtoItem ProtoObject { get; init; }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    public int Id
+    {
+        get => ProtoObject.Id;
+        set
+        {
+            ProtoObject.Id = value;
+            RaisePropertyChanged(nameof(Id));
+        }
+    }
+
+    private ConObject? obj;
+    public ConObject? Obj
+    {
+        get => obj;
+        set
+        {
+            obj = value;
+            ProtoObject.Obj = value?.ProtoObject;
+            RaisePropertyChanged(nameof(Obj));
+        }
+    }
+
+    private TypeOfUnit? unitType;
+    public TypeOfUnit? UnitType
+    {
+        get => unitType;
+        set
+        {
+            unitType = value;
+            ProtoObject.UnitType = value?.ProtoObject;
+            RaisePropertyChanged(nameof(UnitType));
+        }
+    }
+
+    public double CountOfUnits
+    {
+        get => ProtoObject.CountOfUnits;
+        set
+        {
+            ProtoObject.CountOfUnits = value;
+            RaisePropertyChanged(nameof(CountOfUnits));
+        }
+    }
+
+    public double PricePerUnit
+    {
+        get => ProtoObject.PricePerUnit;
+        set
+        {
+            ProtoObject.PricePerUnit = value;
+            RaisePropertyChanged(nameof(PricePerUnit));
+        }
+    }
+
+    public double ExpectedCost
+    {
+        get => ProtoObject.ExpectedCost;
+        set
+        {
+            ProtoObject.ExpectedCost = value;
+            RaisePropertyChanged(nameof(ExpectedCost));
+        }
+    }
+
+    private Producer? producer;
+    public Producer? Producer
+    {
+        get => producer;
+        set
+        {
+            producer = value;
+            ProtoObject.Producer = value?.ProtoObject;
+            RaisePropertyChanged(nameof(Producer));
+        }
+    }
+
+    public string Description
+    {
+        get => ProtoObject.Description;
+        set
+        {
+            ProtoObject.Description = value;
+            RaisePropertyChanged(nameof(Description));
+        }
+    }
+
+    private TypeOfItem? type;
+    public TypeOfItem? Type
+    {
+        get => type;
+        set
+        {
+            type = value;
+            ProtoObject.Type = value?.ProtoObject;
+            RaisePropertyChanged(nameof(Type));
+        }
+    }
+
+    private NameItem? nameItem;
+    public NameItem? NameItem
+    {
+        get => nameItem;
+        set
+        {
+            nameItem = value;
+            ProtoObject.NameItem = value?.ProtoObject;
+            RaisePropertyChanged(nameof(NameItem));
+        }
+    }
+
+    public double CountOfUsedUnits
+    {
+        get => ProtoObject.CountOfUsedUnits;
+        set
+        {
+            ProtoObject.CountOfUsedUnits = value;
+            RaisePropertyChanged(nameof(CountOfUsedUnits));
+        }
+    }
+
+    #endregion
+
+    protected void RaisePropertyChanged(string propertyName)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+}
+
+Исходное сообщение :
+
+message ProtoItemMetaData{
+	int32 id = 1;
+	string name = 2;
+	int32 itemId = 3;
+	bytes data = 4;
+	int32 typeId = 5;
+}
+
+Обертка:
+
+public sealed partial class ItemMetaData : INotifyPropertyChanged
+{
+    public ItemMetaData()
+    {
+        ProtoObject = new ProtoItemMetaData();
+    }
+
+    internal ItemMetaData(ProtoItemMetaData proto)
+    {
+        ProtoObject = proto ?? new ProtoItemMetaData();
+    }
+
+    #region ProtoFields
+
+    internal ProtoItemMetaData ProtoObject { get; init; }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    public int Id
+    {
+        get => ProtoObject.Id;
+        set
+        {
+            ProtoObject.Id = value;
+            RaisePropertyChanged(nameof(Id));
+        }
+    }
+
+    public string Name
+    {
+        get => ProtoObject.Name;
+        set
+        {
+            ProtoObject.Name = value;
+            RaisePropertyChanged(nameof(Name));
+        }
+    }
+
+    public int ItemId
+    {
+        get => ProtoObject.ItemId;
+        set
+        {
+            ProtoObject.ItemId = value;
+            RaisePropertyChanged(nameof(ItemId));
+        }
+    }
+
+    public byte[] Data
+    {
+        get => ProtoObject.Data?.ToByteArray() ?? [];
+        set
+        {
+            ProtoObject.Data = ByteString.CopyFrom(value);
+            RaisePropertyChanged(nameof(Data));
+        }
+    }
+
+    public int TypeId
+    {
+        get => ProtoObject.TypeId;
+        set
+        {
+            ProtoObject.TypeId = value;
+            RaisePropertyChanged(nameof(TypeId));
+        }
+    }
+
+    #endregion
+
+    protected void RaisePropertyChanged(string propertyName)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+}
+
+message ProtoRole{
+	int32 id = 1;
+	string name = 2;
+	string description = 3;
+	repeated int32 permissions = 4;
+}
+
+public sealed partial class Role : INotifyPropertyChanged
+{
+    public Role()
+    {
+        
+        ProtoObject = new ProtoRole();
+        InitializeCollections();
+        Id = -1;
+    }
+
+    internal Role(ProtoRole proto)
+    {
+        ProtoObject = proto ?? new ProtoRole();
+        InitializeCollections();
+    }
+
+    private void InitializeCollections()
+    {
+        permissions = new ObservableCollection<int>(
+            ProtoObject.Permissions);
+        permissions.CollectionChanged += OnPermissionsCollectionChanged;
+    }
+
+    #region ProtoFields
+
+    internal ProtoRole ProtoObject { get; init; }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    public int Id
+    {
+        get => ProtoObject.Id;
+        set
+        {
+            ProtoObject.Id = value;
+            RaisePropertyChanged(nameof(Id));
+        }
+    }
+
+    public string Name
+    {
+        get => ProtoObject.Name;
+        set
+        {
+            ProtoObject.Name = value;
+            RaisePropertyChanged(nameof(Name));
+        }
+    }
+
+    public string Description
+    {
+        get => ProtoObject.Description;
+        set
+        {
+            ProtoObject.Description = value;
+            RaisePropertyChanged(nameof(Description));
+        }
+    }
+
+    private ObservableCollection<int> permissions;
+    public ObservableCollection<int> Permissions
+    {
+        get => permissions;
+        set
+        {
+            if (permissions != null)
+                permissions.CollectionChanged -= OnPermissionsCollectionChanged;
+
+            permissions = value ?? new ObservableCollection<int>();
+            permissions.CollectionChanged += OnPermissionsCollectionChanged;
+
+            SyncPermissions();
+            RaisePropertyChanged(nameof(Permissions));
+        }
+    }
+
+    private void OnPermissionsCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        SyncPermissions();
+        RaisePropertyChanged(nameof(Permissions));
+    }
+
+    private void SyncPermissions()
+    {
+        ProtoObject.Permissions.Clear();
+        ProtoObject.Permissions.AddRange(permissions);
+    }
+
+    #endregion
+
+    protected void RaisePropertyChanged(string propertyName)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+}
+
+Понял как преобразовывать сообщения в обертки?
