@@ -56,5 +56,8 @@ namespace ObjectsManager.Interfaces
         public Func<IEnumerable<ItemWrapper>>? GetSelectedItems { get; set; }
 
         public Action FilterGrid { get; set; }
+
+        public ObservableCollection<Expanses> ExpansesColl { get; set; }
+        public HierarchicalTreeDataGridSource<Expanses> ExpansesSource { get; set; }
     }
 }

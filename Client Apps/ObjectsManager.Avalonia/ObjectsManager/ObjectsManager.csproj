@@ -12,9 +12,11 @@
   <ItemGroup>
     <PackageReference Include="Avalonia" Version="11.3.5" />
     <PackageReference Include="Avalonia.Controls.DataGrid" Version="11.3.5" />
+    <PackageReference Include="Avalonia.Controls.TreeDataGrid" Version="11.1.1" />
     <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.5" />
     <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.5" />
     <PackageReference Include="AvaloniaComponents.MetaDataView" Version="1.0.0" />
+    <PackageReference Include="AvaloniaPdfViewer" Version="0.0.3" />
     <PackageReference Include="BinToss.GroupBox.Avalonia" Version="1.0.0" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
 
