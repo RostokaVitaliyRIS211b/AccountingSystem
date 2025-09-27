@@ -15,33 +15,33 @@
 	<Grid  RowDefinitions="auto,*,auto">
 		<Menu x:Name="MainMenu" Background="{DynamicResource LightGrayBrush}">
 			<MenuItem Header="Справочники">
-				
+
 				<MenuItem Header="Роли" Command="{Binding OpenRoleWindowCommand}">
 					<MenuItem.Icon>
 						<Image Source="/Assets/ColorIcons/icons8-user-50.png"/>
 					</MenuItem.Icon>
 				</MenuItem>
-				
+
 				<MenuItem Header="Пользователи" Command="{Binding OpenUserWindowCommand}">
 					<MenuItem.Icon>
 						<Image Source="/Assets/ColorIcons/icons8-male-user-50.png"/>
 					</MenuItem.Icon>
 				</MenuItem>
-				
+
 				<MenuItem Header="Объекты" Command="{Binding OpenObjectsWindowCommand}">
 					<MenuItem.Icon>
 						<Image Source="/Assets/ColorIcons/icons8-home-50.png"/>
 					</MenuItem.Icon>
 				</MenuItem>
 			</MenuItem>
-			
+
 			<MenuItem Header="Тема">
 				<MenuItem Tag="{Binding Light}" Header="Светлая" Click="MenuItem_Theme_Click"/>
 				<MenuItem Tag="{Binding Dark}" Header="Темная" Click="MenuItem_Theme_Click"/>
 			</MenuItem>
-			
+
 		</Menu>
-		
+
 		<Grid Grid.Row="1" ColumnDefinitions="300,auto,*">
 			<gb:GroupBox>
 				<gb:GroupBox.Header>
@@ -74,9 +74,9 @@
 					</ListBox>
 				</Grid>
 			</gb:GroupBox>
-			
+
 			<GridSplitter  Background="{DynamicResource LightGrayBrush }" Grid.Column="1" Width="3"/>
-			
+
 			<gb:GroupBox Grid.Column="2">
 				<gb:GroupBox.Header>
 					<Border Background="{ DynamicResource WhiteSmokeBrush }" Height="50" CornerRadius="3">
@@ -249,16 +249,17 @@
 
 								</DataGrid.Columns>
 							</DataGrid>
+							
 						</Grid>
 					</TabItem>
 					<TabItem Header="Расходы">
-						
+						<TreeDataGrid Source="{Binding ExpansesSource}"></TreeDataGrid>
 					</TabItem>
 				</TabControl>
 			</gb:GroupBox>
 		</Grid>
-		
+
 		<TextBlock Grid.Row="2" Height="{Binding Height,ElementName=MainMenu}"  Background="{DynamicResource LightGrayBrush }"/>
 	</Grid>
-	
+
 </UserControl>

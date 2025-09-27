@@ -1,19 +1,16 @@
 ﻿using Avalonia;
-using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Controls.Models.TreeDataGrid;
 using Avalonia.Styling;
-
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-
 using GrpcServiceClient;
 using GrpcServiceClient.DataContracts;
-
 using MsBox.Avalonia;
-
 using ObjectsManager.Helpers;
 using ObjectsManager.Interfaces;
 using ObjectsManager.Windows;
-
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -121,7 +118,18 @@ public partial class MainViewModel : ViewModelBase, IMainViewModel
     private ObservableCollection<TypeOfItem> TypesOfItems { get; } = [];
 
     private ObservableCollection<GroupingProperty> GroupingProperties { get; } = [];
+    public ObservableCollection<Expanses> ExpansesColl { get; set; } = [];
 
+    private HierarchicalTreeDataGridSource<Expanses>? _expansesSource;
+    public HierarchicalTreeDataGridSource<Expanses>? ExpansesSource
+    {
+        get => _expansesSource;
+        set
+        {
+            _expansesSource = value;
+            OnPropertyChanged();
+        }
+    }
 
     private string? itemFilter = "";
     public string? FilterItem { get => itemFilter; set { itemFilter = value; OnPropertyChanged(nameof(FilterItem)); FilterGrid?.Invoke(); } }
@@ -599,6 +607,7 @@ public partial class MainViewModel : ViewModelBase, IMainViewModel
                 var wrapper = new ItemWrapper(item, [.. props]);
                 ItemsOfConObj.Add(wrapper);
             }
+            BuildExpansesTree();
         }
         catch
         {
@@ -606,10 +615,83 @@ public partial class MainViewModel : ViewModelBase, IMainViewModel
         }
     }
 
+    private void CalculateTotals(Expanses node)
+    {
+        if (node.Children.Count == 0) return;
+
+        double expected = 0, actual = 0, exaggeration = 0;
+        foreach (var child in node.Children)
+        {
+            CalculateTotals(child);
+            expected += child.ExpectedExp;
+            actual += child.ActualExp;
+            exaggeration += child.Exaggeration;
+        }
+
+        node.ExpectedExp = expected;
+        node.ActualExp = actual;
+        node.Exaggeration = exaggeration;
+    }
+
+    private Expanses FindOrCreateNode(ObservableCollection<Expanses> nodes, string name)
+    {
+        var existing = nodes.FirstOrDefault(n => n.Name == name);
+        if (existing != null)
+            return existing;
+
+        var newNode = new Expanses(name, 0, 0, 0);
+        nodes.Add(newNode);
+        return newNode;
+    }
+
+    public void BuildExpansesTree()
+    {
+        var rootNodes = new ObservableCollection<Expanses>();
+
+        foreach (var item in ItemsOfConObj)
+        {
+            if (item.GroupingProperties == null || item.GroupingProperties.Count == 0)
+            {
+                rootNodes.Add(new Expanses(item.SourceItem.NameItem?.Name ?? "NULL", item.SourceItem.ExpectedCost, item.RealSpend, item.Overspend));
+                continue;
+            }
+
+            var currentLevel = rootNodes;
+
+            for (int i = 0; i < item.GroupingProperties.Count; i++)
+            {
+                var groupName = item.GroupingProperties[i].Name;
+                var node = FindOrCreateNode(currentLevel, groupName);
+
+                if (i == item.GroupingProperties.Count - 1)
+                    node.Children.Add(new Expanses(item.SourceItem.NameItem?.Name ?? "NULL", item.SourceItem.ExpectedCost, item.RealSpend, item.Overspend));
+
+                currentLevel = node.Children;
+            }
+        }
+        foreach (var root in rootNodes)
+        {
+            CalculateTotals(root);
+        }
+
     public void Dispose()
     {
         Service.Dispose();
     }
+        ExpansesColl = new ObservableCollection<Expanses>(rootNodes);
 
+        ExpansesSource = new HierarchicalTreeDataGridSource<Expanses>(ExpansesColl)
+        {
+            Columns =
+            {
+                new HierarchicalExpanderColumn<Expanses>(
+                    new TextColumn<Expanses, string>("Наименование", x => x.Name),
+                    x => x.Children),
+                new TextColumn<Expanses, double>("Ожидаемый расход", x => x.ExpectedExp),
+                new TextColumn<Expanses, double>("Фактический расход", x => x.ActualExp),
+                new TextColumn<Expanses, double>("Перерасход", x => x.Exaggeration),
+            },
+        };
+    }
     #endregion
 }
