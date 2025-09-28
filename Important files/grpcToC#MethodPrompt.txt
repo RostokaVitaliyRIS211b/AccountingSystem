@@ -51,7 +51,22 @@ rpc SetGroupingPropertiesOfItem(ChangeGroupingPropertiesofItem) returns (PBool);
 
 rpc GetAllObjectMetaData(PInt) returns (List_ProtoObjectMetadata);
 
+rpc StartBackup(.google.protobuf.Empty) returns (stream ProtoBackupChunk);
+rpc GetBackupStatus(.google.protobuf.Empty) returns (ProtoBackupStatusResponse);
+
 сообщения:
+
+message ProtoBackupChunk{
+	bool is_last =  1;
+	bytes data = 2;
+}
+
+message ProtoBackupStatusResponse {
+  bool is_done = 1;
+  string error_message = 2;
+  int32 file_size_in_8kb_chunks = 3;
+  bool is_in_process = 4;
+}
 
 message ChangeGroupingPropertiesofItem{
 	List_GroupingProps props = 1;
@@ -760,5 +775,34 @@ public partial class MainService
     {
         var reply = await Client.AddObjectMetaDataAsync(metadata.ProtoObject);
         return reply.Val;
+    }
+
+    public BackupStatusResponse GetBackupStatus()
+    {
+        var reply = Client.GetBackupStatus(new Google.Protobuf.WellKnownTypes.Empty());
+        return new BackupStatusResponse(reply);
+    }
+
+    public async Task<BackupStatusResponse> GetBackupStatusAsync()
+    {
+        var reply = await Client.GetBackupStatusAsync(new Google.Protobuf.WellKnownTypes.Empty());
+        return new BackupStatusResponse(reply);
+    }
+
+    public async IAsyncEnumerable<byte[]> StartBackupAsync([EnumeratorCancellation] CancellationToken ct = default)
+    {
+        var stream = Client.StartBackup(new Google.Protobuf.WellKnownTypes.Empty(), cancellationToken: ct);
+
+        while (await stream.ResponseStream.MoveNext(ct))
+        {
+            var chunk = stream.ResponseStream.Current;
+
+            if (chunk.IsLast)
+            {
+                break;
+            }
+
+            yield return chunk.Data.ToByteArray();
+        }
     }
 }
