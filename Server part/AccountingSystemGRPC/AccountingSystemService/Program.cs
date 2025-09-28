@@ -10,12 +10,14 @@ using AccountingSystemService.Validators;
 using BdClasses;
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 using NLog;
 
 using System.Diagnostics;
+using System.Net;
 using System.Text;
 
 try
@@ -35,6 +37,14 @@ try
 
     builder.Services.AddSingleton(provider => new CustomTokenValidator(AuthServiceHelper.JwtKey));
 
+    builder.WebHost.ConfigureKestrel(options =>
+    {
+        // явно слушаем IPv4 на порту 5001 (gRPC)
+        options.Listen(IPAddress.Any, 5001, configure => configure.Protocols = HttpProtocols.Http2);
+
+        // явно слушаем IPv4 на порту 5002 (Web API)
+        options.Listen(IPAddress.Any, 5002);
+    });
 
     builder.Services.AddDbContext<ConstructionContext>(DbContextHelper.ProcessOptionsBuilder);
 

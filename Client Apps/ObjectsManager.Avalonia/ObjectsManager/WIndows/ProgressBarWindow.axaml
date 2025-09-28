@@ -2,12 +2,12 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="450"
-        x:Class="ObjectsManager.Windows.UnitTypeSelectorWindow"
-        Title="Выбор единицы измерения"
-		Width="400"
+        mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="190"
+        x:Class="ObjectsManager.Windows.ProgressBarWindow"
+		Height="190" Width="400"
+        Title="ProgressBarWindow"
 		xmlns:views="clr-namespace:ObjectsManager.Views"
 		Icon="/Assets/ColorIcons/icons8-home-50.png"
 		WindowStartupLocation="CenterOwner">
-<views:UnitTypeSelectorView/>
+<views:ProgressBarView/>
 </Window>

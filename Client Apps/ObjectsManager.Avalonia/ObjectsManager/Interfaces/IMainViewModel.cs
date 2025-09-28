@@ -70,6 +70,8 @@ namespace ObjectsManager.Interfaces
 
         public abstract Task OpenMetaDataWindow();
 
+        public abstract Task OpenBackupWindow();
+
         public ObservableCollection<Expanses> ExpansesColl { get; set; }
         public HierarchicalTreeDataGridSource<Expanses> ExpansesSource { get; set; }
     }

@@ -552,6 +552,27 @@ public partial class MainViewModel : ViewModelBase, IMainViewModel
     }
 
 
+    [RelayCommand]
+    public async Task OpenBackupWindow()
+    {
+        try
+        {
+            var dataContext = new ProgressBarViewModel(Service);
+            var window = new ProgressBarWindow(dataContext);
+            window.Title = "Загрука бэкапа базы даных";
+
+            if(Win is not null)
+            {
+                await window.ShowDialog(Win);
+            }
+        }
+        catch (Exception e)
+        {
+            await MessageBoxManager.GetMessageBoxStandard(MessageBoxParamsHelper.GetErrorBoxParams($"Ошибка при открытии окна бэкапа базы данных -> {e.Message}")).ShowAsync();
+        }
+    }
+
+
     #endregion
 
     #region OtherMethods

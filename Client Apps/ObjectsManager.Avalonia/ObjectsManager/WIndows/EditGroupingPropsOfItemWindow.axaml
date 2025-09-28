@@ -8,6 +8,7 @@
 		Width="500"
 		Height="600"
 		Icon="/Assets/ColorIcons/icons8-home-50.png"
-        xmlns:views="clr-namespace:ObjectsManager.Views">
+        xmlns:views="clr-namespace:ObjectsManager.Views"
+		WindowStartupLocation="CenterOwner">
 <views:EditGroupingPropsOfItemView/>
 </Window>

@@ -30,5 +30,8 @@
     <Reference Include="GrpcServiceClient">
       <HintPath>..\..\..\Libraries\GrpcServiceClient\GrpcServiceClient\bin\Debug\net9.0\GrpcServiceClient.dll</HintPath>
     </Reference>
+    <Reference Include="Hash">
+      <HintPath>..\..\..\Libraries\HashDehash\Hash\bin\Debug\net9.0\Hash.dll</HintPath>
+    </Reference>
   </ItemGroup>
 </Project>

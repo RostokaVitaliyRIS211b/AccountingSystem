@@ -178,6 +178,7 @@ namespace ObjectsManager.Helpers
                     workSheet.Cell(i + 2, 8).Value = wrapper.SourceItem.Producer?.Name ?? "NULL";
                     workSheet.Cell(i + 2, 9).Value = wrapper.SourceItem.Description ?? "";
                 }
+                
                 workSheet.Columns().AdjustToContents();
                 workSheet.Rows().AdjustToContents();
 

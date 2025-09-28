@@ -9,6 +9,7 @@
         Title="Пользователи"
 		Width="1000"
 		CanResize="False"
-		Height="500">
+		Height="500"
+		WindowStartupLocation="CenterOwner">
 	<views:UsersView/>
 </Window>

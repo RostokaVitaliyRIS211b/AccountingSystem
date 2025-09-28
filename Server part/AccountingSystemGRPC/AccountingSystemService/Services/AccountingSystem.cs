@@ -825,15 +825,26 @@ namespace AccountingSystemService.Services
         [Authorize(Roles = "38")]
         public override async Task StartBackup(Empty request, IServerStreamWriter<ProtoBackupChunk> responseStream, ServerCallContext context)
         {
+            var id = context.RequestHeaders.Get("Id")?.Value;
+            var sessionData = SessionDataManager.GetUserData(id ?? "");
             try
             {
-                //TODO нужно для каждого клиента сделать хуету для сохранения данных сессии возможно как нибудь хз как
+
                 lock (LockObj)
                 {
                     if (IsBackupInProcess)
                     {
                         ErrorHandler.HandleError($"Бэкап уже выполняется. Запрос отклонён.", Severity.Warning);
-                        ErrorMessage = "Бэкап уже выполняется. Подождите завершения текущего бэкапа.";
+                        if (sessionData is not null)
+                        {
+                            sessionData.ErrorMessage = "Бэкап уже выполняется. Запрос отклонён.";
+                            sessionData.IsBackupDone = false;
+                            sessionData.BackupFilePath = "";
+                        }
+                        else
+                        {
+                            ErrorMessage = "Бэкап уже выполняется. Запрос отклонён.";
+                        }
                         return;
                     }
 
@@ -841,6 +852,13 @@ namespace AccountingSystemService.Services
                     ErrorMessage = "";
                     IsBackupDone = false;
                     IsBackupInProcess = true;
+
+                    if (sessionData is not null)
+                    {
+                        sessionData.ErrorMessage = "";
+                        sessionData.IsBackupDone = false;
+                        sessionData.BackupFilePath = "";
+                    }
                 }
 
                 var backupId = Guid.NewGuid();
@@ -878,6 +896,13 @@ namespace AccountingSystemService.Services
 
                 BackupFilePath = backupFilePath;
 
+                if (sessionData is not null)
+                {
+                    sessionData.ErrorMessage = "";
+                    sessionData.IsBackupDone = false;
+                    sessionData.BackupFilePath = backupFilePath;
+                }
+
                 ErrorHandler.HandleError($"Бэкап создан {backupFilePath}", Severity.Information);
 
 
@@ -902,32 +927,55 @@ namespace AccountingSystemService.Services
                     IsLast = true
                 }, context.CancellationToken);
 
-                IsBackupDone = true;
+
                 IsBackupInProcess = false;
+
+                if (sessionData is not null)
+                {
+                    sessionData.ErrorMessage = "";
+                    sessionData.IsBackupDone = true;
+                }
+                else
+                {
+                    IsBackupDone = true;
+                }
 
                 ErrorHandler.HandleError($"Успешный бэкап базы", Severity.Information);
             }
             catch (OperationCanceledException)
             {
                 ErrorMessage = "Бэкап отменён клиентом.";
-                ErrorHandler.HandleError("Бэкап отменён клиентом.",Severity.Information);
+                ErrorHandler.HandleError("Бэкап отменён клиентом.", Severity.Information);
             }
             catch (Exception e)
             {
-                IsBackupDone = false;
-                ErrorMessage = e.Message;
+                if (sessionData is not null)
+                {
+                    sessionData.IsBackupDone = false;
+                    sessionData.ErrorMessage = e.Message;
+                }
+                else
+                {
+                    IsBackupDone = false;
+                    ErrorMessage = e.Message;
+                }
+
                 ErrorHandler.HandleError($"Ошибка при бэкапе базы -> {e.Message}", Severity.Error);
             }
             finally
             {
                 lock (LockObj)
                 {
+                    var backupfilePath = "";
+
+                    backupfilePath = sessionData is not null ? sessionData.BackupFilePath : BackupFilePath;
+
                     ErrorMessage = "";
-                    if (!string.IsNullOrEmpty(BackupFilePath) && File.Exists(BackupFilePath))
+                    if (!string.IsNullOrEmpty(backupfilePath) && File.Exists(backupfilePath))
                     {
                         try
                         {
-                            File.Delete(BackupFilePath);
+                            File.Delete(backupfilePath);
 
                             ErrorHandler.HandleError($"Временный файл удален", Severity.Information);
                         }
@@ -937,7 +985,14 @@ namespace AccountingSystemService.Services
                         }
                     }
 
-                    BackupFilePath = "";
+                    if (sessionData is not null)
+                    {
+                        sessionData.BackupFilePath = "";
+                    }
+                    else
+                    {
+                        BackupFilePath = "";
+                    }
 
                     IsBackupInProcess = false;
                 }
@@ -949,8 +1004,13 @@ namespace AccountingSystemService.Services
         [Authorize(Roles = "38")]
         public override Task<ProtoBackupStatusResponse> GetBackupStatus(Empty request, ServerCallContext context)
         {
+            var id = context.RequestHeaders.Get("Id")?.Value;
+            var sessionData = SessionDataManager.GetUserData(id ?? "");
+
             lock (LockObj)
             {
+
+
                 ProtoBackupStatusResponse status = new()
                 {
                     ErrorMessage = ErrorMessage,
@@ -959,9 +1019,22 @@ namespace AccountingSystemService.Services
                     IsInProcess = IsBackupInProcess
                 };
 
-                if (File.Exists(BackupFilePath))
+                var backupfilePath = "";
+
+                if (sessionData is not null)
                 {
-                    var fileInfo = new FileInfo(BackupFilePath);
+                    backupfilePath = sessionData.BackupFilePath;
+                    status.ErrorMessage = sessionData.ErrorMessage;
+                    status.IsDone = sessionData.IsBackupDone;
+                }
+                else
+                {
+                    backupfilePath = BackupFilePath;
+                }
+
+                if (File.Exists(backupfilePath))
+                {
+                    var fileInfo = new FileInfo(backupfilePath);
                     int size = 0;
                     try
                     {
@@ -982,8 +1055,7 @@ namespace AccountingSystemService.Services
             var id = context.RequestHeaders.Get("Id")?.Value;
             try
             {
-                
-                if(id is not null && SessionDataManager.TryRemoveUser(id))
+                if (id is not null && SessionDataManager.TryRemoveUser(id))
                 {
                     ErrorHandler.HandleError($"Данные сессии пользователя успешно удалены", Severity.Information);
                 }
@@ -1018,7 +1090,7 @@ namespace AccountingSystemService.Services
                         ErrorHandler.HandleError($"Данные сессии для пользователя не были добавлены", Severity.Warning);
                     }
                 }
-                
+
             }
             catch (Exception e)
             {

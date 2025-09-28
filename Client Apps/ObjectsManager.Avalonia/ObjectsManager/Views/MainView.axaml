@@ -40,6 +40,10 @@
 				<MenuItem Tag="{Binding Dark}" Header="Темная" Click="MenuItem_Theme_Click"/>
 			</MenuItem>
 
+			<MenuItem Header="Дополнительно">
+				<MenuItem Header="Загрузить бэкап базы данных" Command="{Binding OpenBackupWindowCommand}"/>
+			</MenuItem>
+			
 		</Menu>
 
 		<Grid Grid.Row="1" ColumnDefinitions="300,auto,*">

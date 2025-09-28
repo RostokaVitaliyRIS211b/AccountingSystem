@@ -8,6 +8,7 @@
         x:Class="ObjectsManager.Windows.MainWindow"
         Icon="/Assets/ColorIcons/icons8-home-50.png"
         Title="Учет материалов и работ"
-		Width="1400">
+		Width="1400"
+		WindowStartupLocation="CenterScreen">
         <views:MainView />
 </Window>

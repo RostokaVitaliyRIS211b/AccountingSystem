@@ -559,7 +559,7 @@ namespace GrpcServiceClient
 
         public async IAsyncEnumerable<byte[]> StartBackupAsync([EnumeratorCancellation] CancellationToken ct = default)
         {
-            var stream = Client.StartBackup(new Google.Protobuf.WellKnownTypes.Empty());
+            var stream = Client.StartBackup(new Google.Protobuf.WellKnownTypes.Empty(), cancellationToken: ct);
 
             while (await stream.ResponseStream.MoveNext(ct))
             {

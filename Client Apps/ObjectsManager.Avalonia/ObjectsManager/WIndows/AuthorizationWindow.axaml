@@ -8,6 +8,7 @@
 		Icon="/Assets/ColorIcons/icons8-home-50.png"
         Title="Авторизация"
 		Height="250"
-		Width="500">
+		Width="500"
+		WindowStartupLocation="CenterScreen">
 <views:AuthorizationView/>
 </Window>

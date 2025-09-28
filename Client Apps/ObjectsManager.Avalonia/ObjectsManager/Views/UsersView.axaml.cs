@@ -18,7 +18,7 @@ public partial class UsersView : UserControl
     {
         if (DataContext is IUsersViewModel { SelectedUser : not null } viewModel)
         {
-            viewModel.SelectedUser.Password = saveButt.Text ?? "";
+            viewModel.SelectedUser.Password = saveButt.Text is not null ? StringCipher.Encrypt(saveButt.Text) : "";
         }
     }
     private void OnSelectionChanged(object sender, SelectionChangedEventArgs e) 

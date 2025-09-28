@@ -73,7 +73,9 @@ namespace ObjectsManager.ViewModels
                     return;
                 }
 
-                MainService service = new(Name,Password,$"http://{IpAddress}:{Port}");
+                var pwd = StringCipher.Encrypt(Password);
+
+                MainService service = new(Name, pwd, $"http://{IpAddress}:{Port}");
 
                 try
                 {
@@ -87,7 +89,7 @@ namespace ObjectsManager.ViewModels
 
                 try
                 {
-                    ConnectionSettingsHelper.SaveSettings(new(IpAddress, Port, Name, Password));
+                    ConnectionSettingsHelper.SaveSettings(new(IpAddress, Port, Name, pwd));
                 }
                 catch
                 {

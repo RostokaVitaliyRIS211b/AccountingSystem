@@ -9,6 +9,7 @@
         Title="Разрешения"
 		CanResize="False"
 		Width="800"
-		Height="450">
+		Height="450"
+		WindowStartupLocation="CenterOwner">
 	<views:PermissionsView/>
 </Window>

@@ -1,0 +1,22 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="190"
+             x:Class="ObjectsManager.Views.ProgressBarView"
+			 xmlns:vm="clr-namespace:ObjectsManager.ViewModels"
+			 x:DataType="vm:ProgressBarViewModel">
+	<Grid RowDefinitions="auto,auto,auto">
+		<ProgressBar Margin="20" ShowProgressText="True" Background="{DynamicResource WhiteBrush}"  Value="{Binding Value}" Maximum="{Binding Maximum}" Height="60"/>
+		<StackPanel Margin="20,0,20,20" Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Left">
+			<TextBlock Text="Этап: "/>
+			<TextBlock Text="{Binding Message}"/>
+		</StackPanel>
+		<Border Background="{DynamicResource WhiteSmokeBrush}" Grid.Row="2" Height="50">
+			<StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+				<Button Content="Начать бэкап" Command="{Binding StartBackupCommand}"/>
+				<Button Margin="10,0" Click="Button_Cancel_Click" Content="Отмена"/>
+			</StackPanel>
+		</Border>
+	</Grid>
+</UserControl>

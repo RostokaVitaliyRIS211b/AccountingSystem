@@ -7,6 +7,7 @@
         Title="Выбор производителя"
 		Width="400"
 		xmlns:views="clr-namespace:ObjectsManager.Views"
-		Icon="/Assets/ColorIcons/icons8-home-50.png">
+		Icon="/Assets/ColorIcons/icons8-home-50.png"
+		WindowStartupLocation="CenterOwner">
 <views:ProducerSelectorView/>
 </Window>
