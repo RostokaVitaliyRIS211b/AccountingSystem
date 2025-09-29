@@ -41,7 +41,7 @@ public partial class ProgressBarView : UserControl
         var file = await topLevel!.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
         {
             Title = $"Сохранение записей",
-            SuggestedFileName = $"Backup {DateTime.Now}",
+            SuggestedFileName = $"Backup {DateTime.Now.ToString().Replace(':','-')}",
             DefaultExtension = $"backup",
             SuggestedStartLocation = folder,
             FileTypeChoices =
