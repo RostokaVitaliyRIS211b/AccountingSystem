@@ -472,7 +472,7 @@ public partial class MainViewModel : ViewModelBase, IMainViewModel
 
             var path = await LoadItems.HandleAsync(null);
 
-            var items = await ExcelSerializatorHelper.LoadExcelFile(path, Service, SelectedObj, TypesOfItems.ToList(), Names.ToList(), TypesOfUnits.ToList(), Producers.ToList()) ?? throw new Exception("Items not loaded");
+            var items = await ExcelSerializatorHelper.LoadExcelFile(path, Service, SelectedObj, TypesOfItems, Names, TypesOfUnits, Producers) ?? throw new Exception("Items not loaded");
 
 
             var selected = SelectedObj;

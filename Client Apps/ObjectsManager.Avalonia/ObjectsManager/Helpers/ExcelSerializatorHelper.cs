@@ -7,6 +7,7 @@ using ObjectsManager.ViewModels;
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -27,8 +28,8 @@ namespace ObjectsManager.Helpers
         public static string ProducerColumn { get; } = "Производитель(по ум. Не определено)";
         public static string DescriptionColumn { get; } = "Примечание(по ум. пустая строка)";
 
-        public static async Task<List<ItemWrapper>?> LoadExcelFile(string? filePath,MainService service,ConObject? conObject, List<TypeOfItem> typesOfItems, List<NameItem>? names = null,
-             List<TypeOfUnit>? typeOfUnits = null, List<Producer>? producers = null)
+        public static async Task<List<ItemWrapper>?> LoadExcelFile(string? filePath,MainService service,ConObject? conObject, ObservableCollection<TypeOfItem> typesOfItems, ObservableCollection<NameItem>? names = null,
+             ObservableCollection<TypeOfUnit>? typeOfUnits = null, ObservableCollection<Producer>? producers = null)
         {
             var list = new List<ItemWrapper>();
 
@@ -63,6 +64,7 @@ namespace ObjectsManager.Helpers
                             nameItem.Id = await service.AddNameItemAsync(nameItem);
                             if (nameItem.Id == -1) continue;
                             item.NameItem = nameItem;
+                            names?.Add(nameItem);
                         }
                         else
                         {
@@ -77,6 +79,7 @@ namespace ObjectsManager.Helpers
                             typeOfUnitItem.Id = await service.AddTypeOfUnitAsync(typeOfUnitItem);
                             if (typeOfUnitItem.Id == -1) continue;
                             item.UnitType = typeOfUnitItem;
+                            typeOfUnits?.Add(typeOfUnitItem);
                         }
                         else
                         {
@@ -110,6 +113,7 @@ namespace ObjectsManager.Helpers
                             producer.Id = await service.AddProducerAsync(producer);
                             if (producer.Id == -1) continue;
                             item.Producer = producer;
+                            producers?.Add(producer);
                         }
                         else
                         {
