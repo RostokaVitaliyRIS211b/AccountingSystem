@@ -27,7 +27,27 @@ namespace AccountingSystemService.Services
         private ObjectCollection objColl { get; }
         private ConstructionContext db { get; set; }
 
-        private static object LockObj { get; } = new();
+        private static object LockBackupTryObj { get; } = new();
+
+        private static object LockObjectMetaData { get; } = new();
+
+        private static object LockItemGroupingProperty { get; } = new();
+
+        private static object LockItem { get; } = new();
+
+        private static object LockItemMetaData { get; } = new();
+
+        private static object LockConObject { get; } = new();
+
+        private static object LockNameItem { get; } = new();
+
+        private static object LockProducer { get; } = new();
+
+        private static object LockTypeUnit { get; } = new();
+
+        private static object LockRole { get; } = new();
+
+        private static object LockUser { get; } = new();
 
         private static string ErrorMessage { get; set; } = "";
 
@@ -53,21 +73,24 @@ namespace AccountingSystemService.Services
             PInt result = new PInt() { Val = -1 };
             try
             {
-                var metaData = new ObjectMetaDatum()
+                lock (LockObjectMetaData)
                 {
-                    Data = request.Data.ToByteArray(),
-                    DataTypeId = request.TypeId,
-                    Name = request.Name,
-                    ObjectId = request.ObjId,
-                };
+                    var metaData = new ObjectMetaDatum()
+                    {
+                        Data = request.Data.ToByteArray(),
+                        DataTypeId = request.TypeId,
+                        Name = request.Name,
+                        ObjectId = request.ObjId,
+                    };
 
-                var db = DbContextHelper.GetConstructionContext();
-                db.ObjectMetaData.Add(metaData);
-                db.SaveChanges();
+                    var db = DbContextHelper.GetConstructionContext();
+                    db.ObjectMetaData.Add(metaData);
+                    db.SaveChanges();
 
-                result.Val = metaData.Id;
+                    result.Val = metaData.Id;
 
-                ErrorHandler.HandleError($"Добавлены метаданные объекту {request.ObjId}", Severity.Information);
+                    ErrorHandler.HandleError($"Добавлены метаданные объекту {request.ObjId}", Severity.Information);
+                }
             }
             catch (Exception e)
             {
@@ -99,8 +122,12 @@ namespace AccountingSystemService.Services
             PBool result = new() { Val = false };
             try
             {
-                result.Val = objColl.AddGroupingPropertyToItem(new(request.Prop), request.ItemId);
-                ErrorHandler.HandleError($"Добавлено свойство группировки у записи {request.ItemId} : {request.Prop.Name} ", Severity.Information);
+                lock (LockItemGroupingProperty)
+                {
+                    result.Val = objColl.AddGroupingPropertyToItem(new(request.Prop), request.ItemId);
+                    ErrorHandler.HandleError($"Добавлено свойство группировки у записи {request.ItemId} : {request.Prop.Name} ", Severity.Information);
+                }
+
             }
             catch (Exception e)
             {
@@ -115,8 +142,11 @@ namespace AccountingSystemService.Services
             PInt result = new() { Val = -1 };
             try
             {
-                result.Val = objColl.AddItem(new(request));
-                ErrorHandler.HandleError($"Добавлена запись {request.NameItem.Name}", Severity.Information);
+                lock (LockItem)
+                {
+                    result.Val = objColl.AddItem(new(request));
+                    ErrorHandler.HandleError($"Добавлена запись {request.NameItem.Name}", Severity.Information);
+                }
             }
             catch (Exception e)
             {
@@ -131,18 +161,21 @@ namespace AccountingSystemService.Services
             PInt ret = new() { Val = -1 };
             try
             {
-                var metaData = new ItemMetaDatum();
-                metaData.Data = request.Data.ToByteArray();
-                metaData.DataTypeId = request.TypeId;
-                metaData.ItemId = request.ItemId;
-                metaData.Name = request.Name;
+                lock (LockItemMetaData)
+                {
+                    var metaData = new ItemMetaDatum();
+                    metaData.Data = request.Data.ToByteArray();
+                    metaData.DataTypeId = request.TypeId;
+                    metaData.ItemId = request.ItemId;
+                    metaData.Name = request.Name;
 
-                db.ItemMetaData.Add(metaData);
-                db.SaveChanges();
+                    db.ItemMetaData.Add(metaData);
+                    db.SaveChanges();
 
-                ret.Val = metaData.Id;
+                    ret.Val = metaData.Id;
 
-                ErrorHandler.HandleError($"Добавлены метаданные для записи {request.ItemId}", Severity.Information);
+                    ErrorHandler.HandleError($"Добавлены метаданные для записи {request.ItemId}", Severity.Information);
+                }
             }
             catch (Exception e)
             {
@@ -157,8 +190,11 @@ namespace AccountingSystemService.Services
             PInt result = new() { Val = -1 };
             try
             {
-                result.Val = objColl.AddName(request.Name);
-                ErrorHandler.HandleError($"Добавлено наименование {request.Name}", Severity.Information);
+                lock (LockNameItem)
+                {
+                    result.Val = objColl.AddName(request.Name);
+                    ErrorHandler.HandleError($"Добавлено наименование {request.Name}", Severity.Information);
+                }
             }
             catch (Exception e)
             {
@@ -173,8 +209,11 @@ namespace AccountingSystemService.Services
             PInt result = new() { Val = -1 };
             try
             {
-                result.Val = objColl.AddObject(request.Name, request.Address, request.Description);
-                ErrorHandler.HandleError($"Добавлен объект {request.Name}", Severity.Information);
+                lock (LockConObject)
+                {
+                    result.Val = objColl.AddObject(request.Name, request.Address, request.Description);
+                    ErrorHandler.HandleError($"Добавлен объект {request.Name}", Severity.Information);
+                }
             }
             catch (Exception e)
             {
@@ -189,8 +228,11 @@ namespace AccountingSystemService.Services
             PInt result = new() { Val = -1 };
             try
             {
-                result.Val = objColl.AddProducer(request.Name);
-                ErrorHandler.HandleError($"Добавлен производитель {request.Name}", Severity.Information);
+                lock (LockProducer)
+                {
+                    result.Val = objColl.AddProducer(request.Name);
+                    ErrorHandler.HandleError($"Добавлен производитель {request.Name}", Severity.Information);
+                }
             }
             catch (Exception e)
             {
@@ -228,8 +270,11 @@ namespace AccountingSystemService.Services
             PInt result = new() { Val = -1 };
             try
             {
-                result.Val = usrColl.AddRole(request.Name, request.Description);
-                ErrorHandler.HandleError($"Добавлена роль {request.Name}", Severity.Information);
+                lock (LockRole)
+                {
+                    result.Val = usrColl.AddRole(request.Name, request.Description);
+                    ErrorHandler.HandleError($"Добавлена роль {request.Name}", Severity.Information);
+                }
             }
             catch (Exception e)
             {
@@ -244,8 +289,11 @@ namespace AccountingSystemService.Services
             PInt result = new() { Val = -1 };
             try
             {
-                result.Val = objColl.AddTypeOfUnit(request.Name);
-                ErrorHandler.HandleError($"Добавлена единица измерения {request.Name}", Severity.Information);
+                lock (LockTypeUnit)
+                {
+                    result.Val = objColl.AddTypeOfUnit(request.Name);
+                    ErrorHandler.HandleError($"Добавлена единица измерения {request.Name}", Severity.Information);
+                }
             }
             catch (Exception e)
             {
@@ -260,8 +308,11 @@ namespace AccountingSystemService.Services
             PInt result = new() { Val = -1 };
             try
             {
-                result.Val = usrColl.AddUser(request.Name, request.Password, request.Description);
-                ErrorHandler.HandleError($"Пользователь {request.Name} добавлен", Severity.Information);
+                lock (LockUser)
+                {
+                    result.Val = usrColl.AddUser(request.Name, request.Password, request.Description);
+                    ErrorHandler.HandleError($"Пользователь {request.Name} добавлен", Severity.Information);
+                }
             }
             catch (Exception e)
             {
@@ -585,16 +636,20 @@ namespace AccountingSystemService.Services
             PBool p = new() { Val = false };
             try
             {
-                var db = DbContextHelper.GetConstructionContext();
-                var metadata = db.ObjectMetaData.FirstOrDefault(x => x.Id == request.Id);
-                if (metadata != null)
+                lock (LockObjectMetaData)
                 {
-                    db.ObjectMetaData.Remove(metadata);
-                    db.SaveChanges();
-                    p.Val = true;
+                    var db = DbContextHelper.GetConstructionContext();
+                    var metadata = db.ObjectMetaData.FirstOrDefault(x => x.Id == request.Id);
+                    if (metadata != null)
+                    {
+                        db.ObjectMetaData.Remove(metadata);
+                        db.SaveChanges();
+                        p.Val = true;
 
-                    ErrorHandler.HandleError($"Метаданные {request.Name} объекта {request.Id} удалены", Severity.Information);
+                        ErrorHandler.HandleError($"Метаданные {request.Name} объекта {request.Id} удалены", Severity.Information);
+                    }
                 }
+
             }
             catch (Exception e)
             {
@@ -609,8 +664,11 @@ namespace AccountingSystemService.Services
             PBool result = new() { Val = false };
             try
             {
-                result.Val = objColl.RemoveGroupingPropertyOfItem(new(request.Prop), request.ItemId);
-                ErrorHandler.HandleError($"Свойство группировки удалено из записи {request.ItemId} удалено", Severity.Information);
+                lock (LockItemGroupingProperty)
+                {
+                    result.Val = objColl.RemoveGroupingPropertyOfItem(new(request.Prop), request.ItemId);
+                    ErrorHandler.HandleError($"Свойство группировки удалено из записи {request.ItemId} удалено", Severity.Information);
+                }
             }
             catch (Exception e)
             {
@@ -625,8 +683,11 @@ namespace AccountingSystemService.Services
             PBool result = new() { Val = false };
             try
             {
-                result.Val = objColl.RemoveItem(request.Id, request.NameItem.Name);
-                ErrorHandler.HandleError($"Запись {request.Id} удалена", Severity.Information);
+                lock (LockItem)
+                {
+                    result.Val = objColl.RemoveItem(request.Id, request.NameItem.Name);
+                    ErrorHandler.HandleError($"Запись {request.Id} удалена", Severity.Information);
+                }
             }
             catch (Exception e)
             {
@@ -641,13 +702,16 @@ namespace AccountingSystemService.Services
             PBool result = new() { Val = false };
             try
             {
-                var metadata = db.ItemMetaData.FirstOrDefault(x => x.Id == request.Id);
-                if (metadata != null)
+                lock (LockItemMetaData)
                 {
-                    db.ItemMetaData.Remove(metadata);
-                    db.SaveChanges();
-                    result.Val = true;
-                    ErrorHandler.HandleError($"Метаданные {request.Name} удалены", Severity.Information);
+                    var metadata = db.ItemMetaData.FirstOrDefault(x => x.Id == request.Id);
+                    if (metadata != null)
+                    {
+                        db.ItemMetaData.Remove(metadata);
+                        db.SaveChanges();
+                        result.Val = true;
+                        ErrorHandler.HandleError($"Метаданные {request.Name} удалены", Severity.Information);
+                    }
                 }
             }
             catch (Exception e)
@@ -663,8 +727,11 @@ namespace AccountingSystemService.Services
             PBool result = new() { Val = false };
             try
             {
-                result.Val = objColl.RemoveObject(request.Id, request.Name);
-                ErrorHandler.HandleError($"Объект {request.Name} удален", Severity.Information);
+                lock (LockConObject)
+                {
+                    result.Val = objColl.RemoveObject(request.Id, request.Name);
+                    ErrorHandler.HandleError($"Объект {request.Name} удален", Severity.Information);
+                }
             }
             catch (Exception e)
             {
@@ -679,8 +746,11 @@ namespace AccountingSystemService.Services
             PBool result = new() { Val = false };
             try
             {
-                result.Val = usrColl.RemoveRole(request.Id, request.Name);
-                ErrorHandler.HandleError($"Роль {request.Name} удалена", Severity.Information);
+                lock (LockRole)
+                {
+                    result.Val = usrColl.RemoveRole(request.Id, request.Name);
+                    ErrorHandler.HandleError($"Роль {request.Name} удалена", Severity.Information);
+                }
             }
             catch (Exception e)
             {
@@ -695,8 +765,11 @@ namespace AccountingSystemService.Services
             PBool result = new() { Val = false };
             try
             {
-                result.Val = usrColl.RemoveUser(request.Id, request.Name);
-                ErrorHandler.HandleError($"Пользователь {request.Name} удален", Severity.Information);
+                lock (LockUser)
+                {
+                    result.Val = usrColl.RemoveUser(request.Id, request.Name);
+                    ErrorHandler.HandleError($"Пользователь {request.Name} удален", Severity.Information);
+                }
             }
             catch (Exception e)
             {
@@ -715,8 +788,11 @@ namespace AccountingSystemService.Services
             PBool result = new() { Val = false };
             try
             {
-                result.Val = objColl.UpdateItem(new(request));
-                ErrorHandler.HandleError($"Запись {request.Id} обновлена", Severity.Information);
+                lock (LockItem)
+                {
+                    result.Val = objColl.UpdateItem(new(request));
+                    ErrorHandler.HandleError($"Запись {request.Id} обновлена", Severity.Information);
+                }
             }
             catch (Exception e)
             {
@@ -731,8 +807,11 @@ namespace AccountingSystemService.Services
             PBool result = new() { Val = false };
             try
             {
-                result.Val = objColl.UpdateObject(new(request));
-                ErrorHandler.HandleError($"Объект {request.Name} обновлен", Severity.Information);
+                lock (LockConObject)
+                {
+                    result.Val = objColl.UpdateObject(new(request));
+                    ErrorHandler.HandleError($"Объект {request.Name} обновлен", Severity.Information);
+                }
             }
             catch (Exception e)
             {
@@ -747,8 +826,11 @@ namespace AccountingSystemService.Services
             PBool result = new() { Val = false };
             try
             {
-                result.Val = usrColl.UpdateRole(new(request));
-                ErrorHandler.HandleError($"Роль {request.Name} обновлена", Severity.Information);
+                lock (LockRole)
+                {
+                    result.Val = usrColl.UpdateRole(new(request));
+                    ErrorHandler.HandleError($"Роль {request.Name} обновлена", Severity.Information);
+                }
             }
             catch (Exception e)
             {
@@ -763,9 +845,11 @@ namespace AccountingSystemService.Services
             PBool result = new() { Val = false };
             try
             {
-                result.Val = usrColl.UpdateUser(new(request));
-
-                ErrorHandler.HandleError($"Пользователь {request.Name} обновлен", Severity.Information);
+                lock (LockUser)
+                {
+                    result.Val = usrColl.UpdateUser(new(request));
+                    ErrorHandler.HandleError($"Пользователь {request.Name} обновлен", Severity.Information);
+                }
             }
             catch (Exception e)
             {
@@ -790,30 +874,33 @@ namespace AccountingSystemService.Services
 
             try
             {
-                var db = DbContextHelper.GetConstructionContext();
-                var propsOfItem = db.GroupingPropertiesForItems.AsNoTracking().Where(x => x.ItemId == request.ItemId).ToList();
-                foreach (var prop in propsOfItem)
+                lock (LockItemGroupingProperty)
                 {
-                    db.GroupingPropertiesForItems.Remove(prop);
+                    var db = DbContextHelper.GetConstructionContext();
+                    var propsOfItem = db.GroupingPropertiesForItems.AsNoTracking().Where(x => x.ItemId == request.ItemId).ToList();
+                    foreach (var prop in propsOfItem)
+                    {
+                        db.GroupingPropertiesForItems.Remove(prop);
+                    }
+
+                    db.SaveChanges();
+
+                    ErrorHandler.HandleError($"Свойства группировки записи {request.ItemId}  удалены", Severity.Information);
+
+                    foreach (var prop in request.Props.Props)
+                    {
+                        var gg = new GroupingPropertiesForItem();
+                        gg.PropId = prop.Id;
+                        gg.ItemId = request.ItemId;
+                        db.GroupingPropertiesForItems.Add(gg);
+                    }
+
+                    db.SaveChanges();
+
+                    ErrorHandler.HandleError($"Свойства группировки записи {request.ItemId} добавлены", Severity.Information);
+
+                    result.Val = true;
                 }
-
-                db.SaveChanges();
-
-                ErrorHandler.HandleError($"Свойства группировки записи {request.ItemId}  удалены", Severity.Information);
-
-                foreach (var prop in request.Props.Props)
-                {
-                    var gg = new GroupingPropertiesForItem();
-                    gg.PropId = prop.Id;
-                    gg.ItemId = request.ItemId;
-                    db.GroupingPropertiesForItems.Add(gg);
-                }
-
-                db.SaveChanges();
-
-                ErrorHandler.HandleError($"Свойства группировки записи {request.ItemId} добавлены", Severity.Information);
-
-                result.Val = true;
             }
             catch (Exception e)
             {
@@ -830,7 +917,7 @@ namespace AccountingSystemService.Services
             try
             {
 
-                lock (LockObj)
+                lock (LockBackupTryObj)
                 {
                     if (IsBackupInProcess)
                     {
@@ -964,7 +1051,7 @@ namespace AccountingSystemService.Services
             }
             finally
             {
-                lock (LockObj)
+                lock (LockBackupTryObj)
                 {
                     var backupfilePath = "";
 
@@ -1007,7 +1094,7 @@ namespace AccountingSystemService.Services
             var id = context.RequestHeaders.Get("Id")?.Value;
             var sessionData = SessionDataManager.GetUserData(id ?? "");
 
-            lock (LockObj)
+            lock (LockBackupTryObj)
             {
 
 
