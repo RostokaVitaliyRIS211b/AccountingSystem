@@ -958,7 +958,7 @@ namespace AccountingSystemService.Services
                     StartInfo = new ProcessStartInfo
                     {
                         FileName = DbContextHelper.PgDumpPath,
-                        Arguments = $"-h localhost -p 5432 -U {DbContextHelper.Username} -d {DbContextHelper.DatabaseName} -F c -f \"{backupFilePath}\"",
+                        Arguments = $"-h localhost -p {DbContextHelper.DatabasePort} -U {DbContextHelper.Username} -d {DbContextHelper.DatabaseName} -F c -f \"{backupFilePath}\"",
                         UseShellExecute = false,
                         RedirectStandardOutput = true,
                         RedirectStandardError = true,

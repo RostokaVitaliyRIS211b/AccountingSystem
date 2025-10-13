@@ -54,7 +54,7 @@ namespace AccountingSystemService.Wrappers
 
         public byte[] Data
         {
-            get => ProtoObject.Data?.ToArray() ?? Array.Empty<byte>();
+            get => ProtoObject.Data?.ToByteArray() ?? Array.Empty<byte>();
             set
             {
                 ProtoObject.Data = ByteString.CopyFrom(value);
