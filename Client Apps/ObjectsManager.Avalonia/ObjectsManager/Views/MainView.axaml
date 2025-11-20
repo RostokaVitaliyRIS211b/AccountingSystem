@@ -126,6 +126,7 @@
 							<DataGrid x:Name="mainDataGrid"  AutoGenerateColumns="False" CanUserReorderColumns="True" CanUserSortColumns="True" CanUserResizeColumns="True" GridLinesVisibility="Horizontal" Grid.Row="1" ItemsSource="{Binding ItemsOfConObj}" SelectedItem="{Binding SelectedObjItem}" SelectionMode="Extended" SelectionChanged="DataGrid_SelectionChanged">
 								<DataGrid.ContextMenu>
 									<ContextMenu>
+										<MenuItem Header="Редактировать свойства записи" Command="{Binding EditItemCommand}"  IsVisible="{Binding SelectedItemsOfConObj.Count, Converter={StaticResource ConMenuOpVisConv}}"/>
 										<MenuItem Header="Редактировать свойства группировки записи" Command="{Binding EditGroupingPropertiesOfItemCommand}" IsVisible="{Binding SelectedItemsOfConObj.Count, Converter={StaticResource ConMenuOpVisConv}}"/>
 										<MenuItem Header="Добавить свойства группировки выбранным записям" Command="{Binding AddGroupingPropToSelectedItemsCommand}" IsVisible="{Binding SelectedItemsOfConObj.Count, Converter={StaticResource ConMenuOpVisConv}, ConverterParameter=1}"/>
 										<MenuItem Header="Удалить свойства группировки у выбранных записей" Command="{Binding DeleteGroupingPropOfSelectedItemsCommand}" IsVisible="{Binding SelectedItemsOfConObj.Count, Converter={StaticResource ConMenuOpVisConv}, ConverterParameter=1}" />

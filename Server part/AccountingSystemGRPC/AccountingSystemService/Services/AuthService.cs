@@ -59,7 +59,7 @@ namespace AccountingSystemService.Services
             }
             catch (Exception e)
             {
-                ErrorHandler.HandleError($"Ошибка при авторизации пользователя {request.Username} -> {Environment.NewLine}{e.Message}", Severity.Error);
+                ErrorHandler.HandleError($"Ошибка при авторизации пользователя {request.Username} -> {Environment.NewLine}{e}", Severity.Error);
             }
             return Task.FromResult(reply);
         }
