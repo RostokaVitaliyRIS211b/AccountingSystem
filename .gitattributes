@@ -61,3 +61,12 @@
 #*.PDF   diff=astextplain
 #*.rtf   diff=astextplain
 #*.RTF   diff=astextplain
+
+"Client Apps/**" linguist-documentation=false
+"Client Apps/**" linguist-vendored
+
+Libraries/** linguist-documentation=false
+Libraries/** linguist-vendored
+
+"Server part/**" linguist-documentation=false
+"Server part/**" linguist-vendored
