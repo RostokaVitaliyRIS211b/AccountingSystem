@@ -1,2 +1,3 @@
 * text=auto
-* linguist-documentation=false
+* linguist-documentation=true
+* linguist-vendored=false
