@@ -1,0 +1,4 @@
+{
+  "ConnectionStrings": { "DatabaseConnection": "host=localhost port=5432 dbname=Construction user=postgres password=a sslmode=disable" },
+  "Port": "5001"
+}

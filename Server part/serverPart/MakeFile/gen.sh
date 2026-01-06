@@ -1,0 +1,1 @@
+protoc --go_out=./ --go_opt=paths=import,module=ServerModule --go-grpc_out=./ --go-grpc_opt=paths=import,module=ServerModule proto/*.proto

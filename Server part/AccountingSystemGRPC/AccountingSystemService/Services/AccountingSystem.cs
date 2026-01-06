@@ -546,7 +546,6 @@ namespace AccountingSystemService.Services
             return Task.FromResult(list);
         }
 
-        [Authorize(Roles = "20")]
         public override Task<List_GroupingProps> GetGroupingPropsByItem(PInt request, ServerCallContext context)
         {
             List_GroupingProps list = new();

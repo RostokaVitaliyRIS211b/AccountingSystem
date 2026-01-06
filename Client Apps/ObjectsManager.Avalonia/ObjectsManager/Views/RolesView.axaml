@@ -55,9 +55,9 @@
 				
 				<StackPanel Grid.Row="0">
 					<TextBlock FontSize="20" Margin="10,10,0,0" Text="Роль:"/>
-					<TextBox TextChanged="OnTextChanged" Margin="10,10,10,10" Text="{Binding SelectedRole.Name}"/>
+					<TextBox  Margin="10,10,10,10" Text="{Binding SelectedRole.Name}"/>
 					<TextBlock FontSize="20" Margin="10,0,0,0" Text="Дополнительно:"/>
-					<TextBox TextChanged="OnTextChanged" Text="{Binding SelectedRole.Description}" Height="240" Margin="10,10,10,10" TextWrapping="Wrap"/>
+					<TextBox  Text="{Binding SelectedRole.Description}" Height="240" Margin="10,10,10,10" TextWrapping="Wrap"/>
 				</StackPanel>
 				
 				<Border Height="2" Background ="{DynamicResource LightGrayBrush}" Grid.Row="1" VerticalAlignment="Top"/>

@@ -11,11 +11,4 @@ public partial class RolesView : UserControl
     {
         InitializeComponent();
     }
-    private void OnTextChanged(object sender, TextChangedEventArgs e)
-    {
-        if (DataContext is IRolesViewModel rolesViewModel) 
-        {
-            rolesViewModel.SaveChanges();
-        }
-	}
 }

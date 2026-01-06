@@ -232,7 +232,7 @@ public partial class MainViewModel : ViewModelBase, IMainViewModel
 
             var dataContext = new AddItemViewModel(SelectedObjItem, SelectedObj, Service, GroupingProperties);
             var window = new AddItemWindow(dataContext);
-            window.Title = $"Редактикрование свойств записи {SelectedObjItem.SourceItem.NameItem?.Name}";
+            window.Title = $"Редактирование свойств записи {SelectedObjItem.SourceItem.NameItem?.Name}";
 
             if (Win != null)
             {

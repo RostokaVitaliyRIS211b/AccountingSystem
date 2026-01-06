@@ -25,8 +25,15 @@ namespace ObjectsManager.ViewModels
             foreach (var item in rolesList)
             {
                 RolesCollection.Add(item);
+                item.PropertyChanged += Item_PropertyChanged;
             }
         }
+
+        private void Item_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            SaveChanges();
+        }
+
         private MainService Service { get; set; }
         public ObservableCollection<Role> RolesCollection { get; } = [];
         public Window? Win { get; set; }
@@ -48,6 +55,7 @@ namespace ObjectsManager.ViewModels
                     return;
                 }
                 RolesCollection.Add(newRole);
+                newRole.PropertyChanged += Item_PropertyChanged;
             }
             catch(SystemException e)
             {
