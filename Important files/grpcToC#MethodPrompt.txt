@@ -806,3 +806,5 @@ public partial class MainService
         }
     }
 }
+
+Понял как генерировать обертки для методов?

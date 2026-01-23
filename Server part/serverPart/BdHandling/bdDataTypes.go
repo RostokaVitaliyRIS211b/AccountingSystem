@@ -115,6 +115,12 @@ type TypeOfUnit struct {
 	Name string `db:"Name"`
 }
 
+type RolesOfUser struct {
+	Id     int `db:"Id"`
+	RoleId int `db:"RoleId"`
+	UserId int `db:"UserId"`
+}
+
 type SimpleDbType interface {
 	GroupingProp | TypeOfUnit | TypeOfItem | Name | Producer
 }

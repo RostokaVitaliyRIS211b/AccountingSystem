@@ -25,3 +25,7 @@
 **/*.opensdf
 **/*.sdf
 **/*.VC.db
+
+# Binaries for programs and plugins
+*.exe
+*.exe~
