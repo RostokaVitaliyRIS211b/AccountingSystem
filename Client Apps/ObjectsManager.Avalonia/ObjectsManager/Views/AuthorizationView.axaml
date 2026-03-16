@@ -5,7 +5,8 @@
              mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="250"
 			 xmlns:vm="clr-namespace:ObjectsManager.ViewModels"
              x:Class="ObjectsManager.Views.AuthorizationView"
-			 x:DataType="vm:AuthorizationViewModel">
+			 x:DataType="vm:AuthorizationViewModel"
+			 KeyUp="UserControl_KeyUp">
 	<Grid RowDefinitions="*,auto">
 		<Grid Grid.Row="0" RowDefinitions="auto,*">
 			<StackPanel Margin="20,20,0,0" Orientation="Horizontal">
@@ -27,6 +28,7 @@
 		</Grid>
 		<Border Grid.Row="1" Background="{DynamicResource LightGrayBrush}" Height="50" HorizontalAlignment="Stretch">
 			<StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+				<TextBlock VerticalAlignment="Center" HorizontalAlignment="Left" Margin="0,0,270,0" Text="{Binding LoadingText}" IsVisible="{Binding IsAuthorizeInProcess}" />
 				<Button Content="Войти" Command="{Binding AuthorizeCommand}"/>
 				<Button Margin="10,0" Content="Отмена" Click="Button_Cancel_Click"/>
 			</StackPanel>

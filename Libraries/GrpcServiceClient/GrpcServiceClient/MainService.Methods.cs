@@ -135,15 +135,15 @@ namespace GrpcServiceClient
             return [.. reply.Producers.Select(x => new Producer(x))];
         }
 
-        public List<ItemMetaData> GetMetaDataOfItem(int itemId)
+        public List<ItemMetaData> GetMetaDataOfItem(int itemId, CancellationToken token)
         {
-            var reply = Client.GetMetaDataOfItem(new PInt() { Val = itemId });
+            var reply = Client.GetMetaDataOfItem(new PInt() { Val = itemId }, cancellationToken:token);
             return [.. reply.Metadata.Select(x => new ItemMetaData(x))];
         }
 
-        public async Task<List<ItemMetaData>> GetMetaDataOfItemAsync(int itemId)
+        public async Task<List<ItemMetaData>> GetMetaDataOfItemAsync(int itemId, CancellationToken token)
         {
-            var reply = await Client.GetMetaDataOfItemAsync(new PInt() { Val = itemId });
+            var reply = await Client.GetMetaDataOfItemAsync(new PInt() { Val = itemId }, cancellationToken: token);
             return [.. reply.Metadata.Select(x => new ItemMetaData(x))];
         }
 
@@ -509,15 +509,15 @@ namespace GrpcServiceClient
             return [.. reply.Types_.Select(x => new MetaDataType(x))];
         }
 
-        public List<ObjectMetadata> GetAllObjectMetaData(int objectId)
+        public List<ObjectMetadata> GetAllObjectMetaData(int objectId, CancellationToken token)
         {
-            var reply = Client.GetAllObjectMetaData(new PInt() { Val = objectId });
+            var reply = Client.GetAllObjectMetaData(new PInt() { Val = objectId }, cancellationToken: token);
             return [.. reply.Metadata.Select(x => new ObjectMetadata(x))];
         }
 
-        public async Task<List<ObjectMetadata>> GetAllObjectMetaDataAsync(int objectId)
+        public async Task<List<ObjectMetadata>> GetAllObjectMetaDataAsync(int objectId, CancellationToken token)
         {
-            var reply = await Client.GetAllObjectMetaDataAsync(new PInt() { Val = objectId });
+            var reply = await Client.GetAllObjectMetaDataAsync(new PInt() { Val = objectId }, cancellationToken: token);
             return [.. reply.Metadata.Select(x => new ObjectMetadata(x))];
         }
 
@@ -572,6 +572,28 @@ namespace GrpcServiceClient
 
                 yield return chunk.Data.ToByteArray();
             }
+        }
+
+        public List<(Item item, List<GroupingProperty> groupingProperties)> GetItemsByObjectWithGroupingProps(int objectId, CancellationToken token)
+        {
+            var res = Client.GetItemsByObjectWithGroupingProps(new PInt() { Val = objectId },cancellationToken:token);
+            var result = new List<(Item item, List<GroupingProperty> groupingProperties)>();
+            foreach (var item in res.Items)
+            {
+                result.Add((new Item(item.Item), [..item.Props.Props.Select(x=>new GroupingProperty(x))]));
+            }
+            return result;
+        }
+
+        public async Task<List<(Item item, List<GroupingProperty> groupingProperties)>> GetItemsByObjectWithGroupingPropsAsync(int objectId, CancellationToken token)
+        {
+            var res = await Client.GetItemsByObjectWithGroupingPropsAsync(new PInt() { Val = objectId }, cancellationToken: token);
+            var result = new List<(Item item, List<GroupingProperty> groupingProperties)>();
+            foreach (var item in res.Items)
+            {
+                result.Add((new Item(item.Item), [.. item.Props.Props.Select(x => new GroupingProperty(x))]));
+            }
+            return result;
         }
     }
 }

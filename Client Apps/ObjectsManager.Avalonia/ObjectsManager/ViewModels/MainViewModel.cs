@@ -17,6 +17,9 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using ObjectsManager.Core;
+using System.Diagnostics;
+using System.Threading;
+using Avalonia.Threading;
 
 namespace ObjectsManager.ViewModels;
 
@@ -69,6 +72,7 @@ public partial class MainViewModel : ViewModelBase, IMainViewModel
         {
             GroupingProperties.Add(prop);
         }
+        IsCachingOn = AppSettingsHelper.Settings.IsCachingOn;
     }
 
     #endregion
@@ -141,6 +145,18 @@ public partial class MainViewModel : ViewModelBase, IMainViewModel
     public Interaction<object?, string?> LoadItems { get; } = new();
 
     public Interaction<object?, string?> SaveItems { get; } = new();
+
+
+    private bool _itemsLoading = false;
+    public bool IsItemsLoading { get => _itemsLoading; set { _itemsLoading = value; OnPropertyChanged(nameof(IsItemsLoading)); } }
+
+
+    private string _loadingText = "Загрузка...";
+    public string LoadingText { get => _loadingText; set { _loadingText = value; OnPropertyChanged(nameof(LoadingText)); } }
+
+
+    private bool _IsCachingOn = AppSettingsHelper.Settings.IsCachingOn;
+    public bool IsCachingOn { get => _IsCachingOn; set { _IsCachingOn = value; OnPropertyChanged(nameof(IsCachingOn));} }
 
     #endregion
 
@@ -540,7 +556,7 @@ public partial class MainViewModel : ViewModelBase, IMainViewModel
 
             window.Title = $"Дополнительная информация по объекту: {SelectedObj.Name}";
 
-            if(Win is not null)
+            if (Win is not null)
             {
                 await window.ShowDialog(Win);
             }
@@ -561,7 +577,7 @@ public partial class MainViewModel : ViewModelBase, IMainViewModel
             var window = new ProgressBarWindow(dataContext);
             window.Title = "Загрука бэкапа базы даных";
 
-            if(Win is not null)
+            if (Win is not null)
             {
                 await window.ShowDialog(Win);
             }
@@ -573,9 +589,48 @@ public partial class MainViewModel : ViewModelBase, IMainViewModel
     }
 
 
+    [RelayCommand]
+    private async Task RefreshObjectCache()
+    {
+        try
+        {
+            if (SelectedObj is not null)
+            {
+                await Task.Delay(1);
+                var currentObj = SelectedObj;
+                SelectedObj = null;
+                CacheManager.RemoveObjectCache(currentObj.Id);
+                SelectedObj = currentObj;
+            }
+        }
+        catch
+        {
+
+        }
+    }
+
+
+    [RelayCommand]
+    private async Task ClearAllCache()
+    {
+        try
+        {
+            await Task.Delay(1);
+            CacheManager.ClearAllCache();
+        }
+        catch 
+        { }
+    }
+
+
     #endregion
 
     #region OtherMethods
+
+    public void SaveNewSettings()
+    {
+        AppSettingsHelper.SaveSettings(AppSettingsHelper.Settings.Copy(IsCachingOn));
+    }
 
     public bool FilteringItem(object item)
     {
@@ -617,24 +672,82 @@ public partial class MainViewModel : ViewModelBase, IMainViewModel
 
     }
 
-    private void ConObjChanged()
+    private CancellationTokenSource LastTokenSource { get; set; } = new CancellationTokenSource();
+
+    private async void ConObjChanged()
     {
+        LastTokenSource.Cancel();
+        LastTokenSource = new CancellationTokenSource();
+        var token = LastTokenSource.Token;
+        Dispatcher.UIThread.Invoke(
+            ItemsOfConObj.Clear
+        );
+
+        if (SelectedObj is null)
+        {
+            return;
+        }
+
         try
         {
-            ItemsOfConObj.Clear();
-            foreach (var item in Service.GetItemsByObject(SelectedObj?.Id ?? -1))
+            Dispatcher.UIThread.Invoke(() => { IsItemsLoading = true; });
+            _ = StartLoadingAnimation(token);
+            var data = CacheManager.GetObjectCache(SelectedObj.Id);
+            if (IsCachingOn && data is not null)
             {
-                var props = Service.GetGroupingPropsByItem(item.Id);
-                var wrapper = new ItemWrapper(item, [.. props]);
-                ItemsOfConObj.Add(wrapper);
+                foreach (var item in data)
+                {
+                    Dispatcher.UIThread.Invoke(() =>
+                    {
+                        ItemsOfConObj.Add(item);
+                    });
+                    if (token.IsCancellationRequested)
+                    {
+                        return;
+                    }
+                }
             }
+            else
+            {
+                foreach (var (item, groupingProperties) in (await Service.GetItemsByObjectWithGroupingPropsAsync(SelectedObj.Id, token)))
+                {
+                    var wrapper = new ItemWrapper(item, [.. groupingProperties]);
+                    Dispatcher.UIThread.Invoke(() =>
+                    {
+                        ItemsOfConObj.Add(wrapper);
+                    });
+                    if (token.IsCancellationRequested)
+                    {
+                        return;
+                    }
+                }
+
+                if (IsCachingOn)
+                {
+                    CacheManager.AddOrUpdateObjectCache(SelectedObj.Id, [.. ItemsOfConObj]);
+                }
+            }
+
+            if (token.IsCancellationRequested)
+            {
+                return;
+            }
+
             BuildExpansesTree();
         }
         catch
         {
 
         }
+
+        if (!token.IsCancellationRequested)
+        {
+            Dispatcher.UIThread.Invoke(() => { IsItemsLoading = false; });
+            LastTokenSource.Cancel();
+        }
     }
+
+    #region ExpensesTree
 
     private void CalculateTotals(Expanses node)
     {
@@ -710,10 +823,29 @@ public partial class MainViewModel : ViewModelBase, IMainViewModel
         };
     }
 
+    #endregion
+
     public void Dispose()
     {
         Service.Dispose();
     }
-       
+
+    public async Task StartLoadingAnimation(CancellationToken token)
+    {
+        Dispatcher.UIThread.Invoke(() => { LoadingText = "Загрузка"; });
+        var delay = 300;
+        while (!token.IsCancellationRequested)
+        {
+            await Task.Delay(delay, token);
+            Dispatcher.UIThread.Invoke(() => { LoadingText = LoadingText + "."; });
+            await Task.Delay(delay, token);
+            Dispatcher.UIThread.Invoke(() => { LoadingText = LoadingText + "."; });
+            await Task.Delay(delay, token);
+            Dispatcher.UIThread.Invoke(() => { LoadingText = LoadingText + "."; });
+            await Task.Delay(delay, token);
+            Dispatcher.UIThread.Invoke(() => { LoadingText = "Загрузка"; });
+        }
+    }
+
     #endregion
 }

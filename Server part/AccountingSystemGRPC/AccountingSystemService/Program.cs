@@ -8,7 +8,7 @@ using AccountingSystemService.Services;
 using AccountingSystemService.Validators;
 
 using BdClasses;
-
+using Grpc.Net.Compression;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
@@ -33,6 +33,7 @@ try
     {
         options.MaxSendMessageSize = 100 * 1024 * 1024;
         options.MaxReceiveMessageSize = 100 * 1024 * 1024;
+        options.CompressionProviders = [new GzipCompressionProvider(System.IO.Compression.CompressionLevel.SmallestSize)];
     });
 
     builder.Services.AddSingleton(provider => new CustomTokenValidator(AuthServiceHelper.JwtKey));

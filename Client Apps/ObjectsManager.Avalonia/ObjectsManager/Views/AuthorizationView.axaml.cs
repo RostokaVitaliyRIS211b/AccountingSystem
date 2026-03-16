@@ -6,6 +6,7 @@ using Avalonia.Media;
 using Avalonia.Styling;
 
 using ObjectsManager.Helpers;
+using ObjectsManager.ViewModels;
 
 namespace ObjectsManager.Views;
 
@@ -18,7 +19,7 @@ public partial class AuthorizationView : UserControl
 
     private void Button_Cancel_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
-        if(Parent is Window window)
+        if (Parent is Window window)
         {
             window.Close();
         }
@@ -28,9 +29,9 @@ public partial class AuthorizationView : UserControl
     {
         base.OnLoaded(e);
 
-        if(Application.Current != null)
+        if (Application.Current != null)
         {
-            if(Application.Current.ActualThemeVariant == ThemeVariant.Dark)
+            if (Application.Current.ActualThemeVariant == ThemeVariant.Dark)
             {
                 Application.Current.Resources["LightGrayBrush"] = new SolidColorBrush(Colors.Gray);
                 Application.Current.Resources["WhiteSmokeBrush"] = new SolidColorBrush(Colors.DimGray);
@@ -43,5 +44,11 @@ public partial class AuthorizationView : UserControl
         }
     }
 
-   
+    private async void UserControl_KeyUp(object? sender, Avalonia.Input.KeyEventArgs e)
+    {
+        if(e.Key == Avalonia.Input.Key.Enter && DataContext is AuthorizationViewModel model && !model.IsAuthorizeInProcess)
+        {
+            await model.Authorize();
+        }
+    }
 }

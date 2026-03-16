@@ -583,6 +583,40 @@ namespace AccountingSystemService.Services
             return Task.FromResult(list);
         }
 
+        [Authorize(Roles = "19")]
+        public override Task<List_ItemsWithGroupingProps> GetItemsByObjectWithGroupingProps(PInt request, ServerCallContext context)
+        {
+            List_ItemsWithGroupingProps list = new();
+            try
+            {
+                
+                foreach (var item in objColl.GetItemsByObject(request.Val))
+                {
+                    var itemWGP = new ProtoItemWithGroupingProps
+                    {
+                        Item = item
+                    };
+                    itemWGP.Props = new List_GroupingProps();
+                    foreach(var gitem in objColl.GetPropertiesOfItem(item.Id))
+                    {
+                        itemWGP.Props.Props.Add(gitem);
+                    }
+                    list.Items.Add(itemWGP);
+                }
+                ErrorHandler.HandleError($"Загружены записи объекта {request.Val}", Severity.Information);
+            }
+            catch (Exception e)
+            {
+                ErrorHandler.HandleError($"Ошибка при получении всех записей объекта {request.Val} -> {e.Message}", Severity.Error);
+            }
+            return Task.FromResult(list);
+        }  
+        
+
+       
+           
+        
+
         [Authorize(Roles = "22")]
         public override Task<ProtoJournal> GetJournal(Empty request, ServerCallContext context)
         {

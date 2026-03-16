@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36221.1 d17.14
+VisualStudioVersion = 17.14.36221.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GrpcServiceClient", "GrpcServiceClient\GrpcServiceClient.csproj", "{8E1DB1E9-808A-447A-93C1-F0328FBB6284}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProtoGeneratedClasses", "ProtoGeneratedClasses\ProtoGeneratedClasses.csproj", "{C2DB518B-E241-4FC8-A169-52E28B8C064D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GrpcServiceTest", "GrpcServiceTest\GrpcServiceTest.csproj", "{4A032CA0-FBA5-4B33-8E28-1573A2CF75C7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{C2DB518B-E241-4FC8-A169-52E28B8C064D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C2DB518B-E241-4FC8-A169-52E28B8C064D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C2DB518B-E241-4FC8-A169-52E28B8C064D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4A032CA0-FBA5-4B33-8E28-1573A2CF75C7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4A032CA0-FBA5-4B33-8E28-1573A2CF75C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4A032CA0-FBA5-4B33-8E28-1573A2CF75C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4A032CA0-FBA5-4B33-8E28-1573A2CF75C7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

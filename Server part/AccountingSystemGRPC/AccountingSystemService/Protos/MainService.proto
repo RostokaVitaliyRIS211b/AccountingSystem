@@ -11,6 +11,7 @@ service AccountingSystem {
   
 	rpc GetAllPermissions(.google.protobuf.Empty) returns (List_Permissions);
 	rpc GetItemsByObject(PInt) returns (List_Items);
+	rpc GetItemsByObjectWithGroupingProps(PInt) returns (List_ItemsWithGroupingProps);
 	rpc GetAllObjects(.google.protobuf.Empty) returns (List_Objects);
 	rpc GetAllGroupingProps(.google.protobuf.Empty) returns (List_GroupingProps);
 	rpc GetGroupingPropsByItem(PInt) returns (List_GroupingProps);
@@ -155,6 +156,10 @@ message List_ProtoObjectMetadata{
 	repeated ProtoObjectMetadata metadata = 1;
 }
 
+message List_ItemsWithGroupingProps{
+	repeated ProtoItemWithGroupingProps items = 1;
+}
+
 message ProtoUser{
 	int32 id = 1;
 	string name = 2;
@@ -254,4 +259,10 @@ message ProtoItem{
 	ProtoNameItem nameItem = 10;
 	double countOfUsedUnits = 11;
 }
+
+message ProtoItemWithGroupingProps{
+	ProtoItem item = 1;
+	List_GroupingProps props = 2;
+}
+
 

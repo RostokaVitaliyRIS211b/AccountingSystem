@@ -10,25 +10,25 @@ using System.Xml.Serialization;
 
 namespace ObjectsManager.Helpers
 {
-    public static class ConnectionSettingsHelper
+    public static class AppSettingsHelper
     {
-        public static ConnectionSettings Settings { get; private set; }
+        public static AppSettings Settings { get; private set; }
 
         private static string PathSettings { get; } = "";
 
-        static ConnectionSettingsHelper()
+        static AppSettingsHelper()
         {
             try
             {
                 var currentDir = AppDomain.CurrentDomain.BaseDirectory;
-                var path = Path.Combine(currentDir, "connectionSettings.json");
+                var path = Path.Combine(currentDir, "appsettings.json");
                 PathSettings = path;
                 var options = new JsonSerializerOptions()
                 {
                     WriteIndented = true,
                     Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
                 };
-                var settings = JsonSerializer.Deserialize<ConnectionSettings>(File.ReadAllText(PathSettings),options);
+                var settings = JsonSerializer.Deserialize<AppSettings>(File.ReadAllText(PathSettings), options);
                 Settings = settings!;
             }
             catch
@@ -36,10 +36,10 @@ namespace ObjectsManager.Helpers
 
             }
 
-            Settings ??= new("127.0.0.1", "5001", "","");
+            Settings ??= new("127.0.0.1", "5001", "", "");
         }
 
-        public static void SaveSettings(ConnectionSettings settings)
+        public static void SaveSettings(AppSettings settings)
         {
             Settings = settings;
             try
@@ -59,13 +59,14 @@ namespace ObjectsManager.Helpers
         }
     }
 
-    public class ConnectionSettings
+    public class AppSettings
     {
-        public ConnectionSettings(string IpAddress, string Port, string UserName, string password)
+        public AppSettings(string IpAddress, string Port, string UserName, string password, bool IsCachingOn = false)
         {
             this.IpAddress = IpAddress;
             this.Port = Port;
             this.UserName = UserName;
+            this.IsCachingOn = IsCachingOn;
             Password = password;
         }
 
@@ -78,9 +79,14 @@ namespace ObjectsManager.Helpers
         [JsonPropertyName("Пользователь")]
         public string UserName { get; }
 
+        [JsonPropertyName("Кэширование")]
+        public bool IsCachingOn { get; }
+
         [JsonIgnore]
         [XmlIgnore]
         public string Password { get; }
+
+        public AppSettings Copy(bool IsCachingOn) => new(IpAddress, Port, UserName, Password, IsCachingOn);
     }
 
 

@@ -1,7 +1,7 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
-
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.Input;
 
 using GrpcServiceClient;
@@ -18,6 +18,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ObjectsManager.ViewModels
@@ -26,9 +27,9 @@ namespace ObjectsManager.ViewModels
     {
         public AuthorizationViewModel()
         {
-            Name = ConnectionSettingsHelper.Settings.UserName;
-            IpAddress = ConnectionSettingsHelper.Settings.IpAddress;
-            Port = ConnectionSettingsHelper.Settings.Port;
+            Name = AppSettingsHelper.Settings.UserName;
+            IpAddress = AppSettingsHelper.Settings.IpAddress;
+            Port = AppSettingsHelper.Settings.Port;
         }
 
         private string _name = "";
@@ -44,11 +45,24 @@ namespace ObjectsManager.ViewModels
         public string Port { get => _port; set { _port = value; OnPropertyChanged(nameof(Name)); } }
         public Window? Win { get; set; }
 
+
+        private string _LoadingText = "Загрузка";
+        public string LoadingText { get => _LoadingText; set { _LoadingText = value; OnPropertyChanged(nameof(LoadingText)); } }
+
+
+        private bool _IsAuthorizeInProcess = false;
+        public bool IsAuthorizeInProcess { get => _IsAuthorizeInProcess; set { _IsAuthorizeInProcess = value; OnPropertyChanged(nameof(IsAuthorizeInProcess)); } }
+
+
         [RelayCommand]
         public async Task Authorize()
         {
+            var tokenSource = new CancellationTokenSource();
             try
             {
+                await Task.Delay(1);
+                Dispatcher.UIThread.Invoke(() => { IsAuthorizeInProcess = true; });
+                _ = StartLoadingAnimation(tokenSource.Token);
                 if (string.IsNullOrWhiteSpace(Name))
                 {
                     await MessageBoxManager.GetMessageBoxStandard(MessageBoxParamsHelper.GetErrorBoxParams($"Имя пользователя не может быть пустым")).ShowAsync();
@@ -74,6 +88,7 @@ namespace ObjectsManager.ViewModels
                 }
 
                 var pwd = StringCipher.Encrypt(Password);
+                //var speed = 100 * 1024*1024;
 
                 MainService service = new(Name, pwd, $"http://{IpAddress}:{Port}");
 
@@ -89,18 +104,18 @@ namespace ObjectsManager.ViewModels
 
                 try
                 {
-                    ConnectionSettingsHelper.SaveSettings(new(IpAddress, Port, Name, pwd));
+                    AppSettingsHelper.SaveSettings(new(IpAddress, Port, Name, pwd,AppSettingsHelper.Settings.IsCachingOn));
                 }
                 catch
                 {
 
                 }
 
-                if(Application.Current != null)
+                if (Application.Current != null)
                 {
                     var window = new MainWindow(new MainViewModel(service));
 
-                    if(Application.Current.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime lifetime)
+                    if (Application.Current.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime lifetime)
                     {
                         lifetime.MainWindow = window;
                     }
@@ -114,10 +129,32 @@ namespace ObjectsManager.ViewModels
             {
                 await MessageBoxManager.GetMessageBoxStandard(MessageBoxParamsHelper.GetErrorBoxParams($"Ошибка при авторизации -> {e.Message}")).ShowAsync();
             }
+            finally
+            {
+                IsAuthorizeInProcess = false;
+                tokenSource.Cancel();
+            }
 
         }
 
         [GeneratedRegex(@"^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$")]
         private static partial Regex IpValidation();
+
+        public async Task StartLoadingAnimation(CancellationToken token)
+        {
+            Dispatcher.UIThread.Invoke(() => { LoadingText = "Загрузка"; });
+            var delay = 300;
+            while (!token.IsCancellationRequested)
+            {
+                await Task.Delay(delay, token);
+                Dispatcher.UIThread.Invoke(() => { LoadingText = LoadingText + "."; });
+                await Task.Delay(delay, token);
+                Dispatcher.UIThread.Invoke(() => { LoadingText = LoadingText + "."; });
+                await Task.Delay(delay, token);
+                Dispatcher.UIThread.Invoke(() => { LoadingText = LoadingText + "."; });
+                await Task.Delay(delay, token);
+                Dispatcher.UIThread.Invoke(() => { LoadingText = "Загрузка"; });
+            }
+        }
     }
 }

@@ -4,8 +4,10 @@ using ObjectsManager.Core;
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ObjectsManager.Interfaces
@@ -20,10 +22,16 @@ namespace ObjectsManager.Interfaces
 
         public TabItem? SelectedTabItem { get; set; }
 
+        public bool IsLoading { get; set; }
+
         public abstract Task LoadFile();
 
         public abstract Task SaveFile();
 
-        public IEnumerable<TabItem> SetTabItems(TabControl tabControl);
+        public abstract void ClearCache();
+
+        public Task<IEnumerable<TabItem>> SetTabItems(TabControl tabControl, CancellationToken token);
+
+        public event PropertyChangedEventHandler? PropertyChanged;
     }
 }

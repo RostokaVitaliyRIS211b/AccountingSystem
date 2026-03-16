@@ -46,8 +46,10 @@ namespace ObjectsManager.ViewModels
         {
             try
             {
-                var newRole = new Role();
-                newRole.Name = $"Новая роль {DateTime.Now}";
+                var newRole = new Role
+                {
+                    Name = $"Новая роль {DateTime.Now}"
+                };
                 newRole.Id = await Service.AddRoleAsync(newRole);
                 if (newRole.Id == -1)
                 {

@@ -1,10 +1,10 @@
-﻿ using Avalonia;
+﻿using Avalonia;
 using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
 using Avalonia.Styling;
-
+using ObjectsManager.Helpers;
 using ObjectsManager.Interfaces;
 using ObjectsManager.ViewModels;
 
@@ -33,8 +33,9 @@ public partial class MainView : UserControl
         _selectFileInteractionDisposable?.Dispose();
         _saveFileInteractionDisposable?.Dispose();
 
-        if (DataContext is IMainViewModel viewModel)
+        if (DataContext is MainViewModel viewModel)
         {
+            viewModel.IsCachingOn = AppSettingsHelper.Settings.IsCachingOn;
             viewModel.GetSelectedItems = GetSelected;
             viewModel.FilterGrid = Filter;
             _selectFileInteractionDisposable = viewModel.LoadItems.RegisterHandler(InteractionHandler);
@@ -54,7 +55,7 @@ public partial class MainView : UserControl
     private IEnumerable<ItemWrapper> GetSelected()
     {
         var result = new List<ItemWrapper>();
-        foreach(ItemWrapper wrap in mainDataGrid.SelectedItems)
+        foreach (ItemWrapper wrap in mainDataGrid.SelectedItems)
         {
             result.Add(wrap);
         }
@@ -63,7 +64,7 @@ public partial class MainView : UserControl
 
     private void MenuItem_Theme_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
-        if(sender is MenuItem item && item.Tag is ThemeVariant variant && Application.Current is not null)
+        if (sender is MenuItem item && item.Tag is ThemeVariant variant && Application.Current is not null)
         {
             Application.Current.RequestedThemeVariant = variant;
         }
@@ -81,7 +82,7 @@ public partial class MainView : UserControl
 
     private void NumericUpDown_ValueChanged(object? sender, Avalonia.Controls.NumericUpDownValueChangedEventArgs e)
     {
-        if(DataContext is IMainViewModel viewModel && mainDataGrid.CollectionView is DataGridCollectionView view &&
+        if (DataContext is IMainViewModel viewModel && mainDataGrid.CollectionView is DataGridCollectionView view &&
             sender is NumericUpDown numeric)
         {
             view.GroupDescriptions.Clear();
@@ -91,7 +92,7 @@ public partial class MainView : UserControl
                 var groups = (int)Math.Floor(numeric.Value ?? 0);
                 if (groups > 0)
                 {
-                    for(int i = 1; i <= groups; i++)
+                    for (int i = 1; i <= groups; i++)
                     {
                         view.GroupDescriptions.Add(new GroupingByProp(i));
                     }
@@ -108,10 +109,10 @@ public partial class MainView : UserControl
 
     private void DataGrid_SelectionChanged(object? sender, Avalonia.Controls.SelectionChangedEventArgs e)
     {
-        if(DataContext is IMainViewModel viewModel)
+        if (DataContext is IMainViewModel viewModel)
         {
             viewModel.SelectedItemsOfConObj.Clear();
-            foreach(ItemWrapper wrapper in mainDataGrid.SelectedItems)
+            foreach (ItemWrapper wrapper in mainDataGrid.SelectedItems)
             {
                 viewModel.SelectedItemsOfConObj.Add(wrapper);
             }
@@ -159,7 +160,7 @@ public partial class MainView : UserControl
             Title = $"Сохранение записей",
             SuggestedFileName = "Items",
             DefaultExtension = $"xlsx",
-            SuggestedStartLocation= folder,
+            SuggestedStartLocation = folder,
             FileTypeChoices =
             [
                 new FilePickerFileType($"Excel документ")
@@ -170,5 +171,22 @@ public partial class MainView : UserControl
         });
         SaveFilePath = file?.TryGetLocalPath();
         return SaveFilePath;
+    }
+
+    private void CheckBox_IsCheckedChanged(object? sender, RoutedEventArgs e)
+    {
+        if(sender is CheckBox box)
+        {
+            ChangeCachingMode(box.IsChecked ?? false);
+        }
+    }
+
+    private void ChangeCachingMode(bool cachingMode)
+    {
+        AppSettingsHelper.SaveSettings(AppSettingsHelper.Settings.Copy(cachingMode));
+        if (DataContext is MainViewModel model)
+        {
+            model.IsCachingOn = cachingMode;
+        }
     }
 }

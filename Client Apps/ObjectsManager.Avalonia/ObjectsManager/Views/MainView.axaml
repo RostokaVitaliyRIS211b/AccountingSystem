@@ -42,8 +42,13 @@
 
 			<MenuItem Header="Дополнительно">
 				<MenuItem Header="Загрузить бэкап базы данных" Command="{Binding OpenBackupWindowCommand}"/>
+				<MenuItem Header="Очистить кэш" Command="{Binding ClearAllCacheCommand}" />
 			</MenuItem>
 			
+			<MenuItem Header="Настройки">
+				<CheckBox x:Name="cachingCheckBox" Content="Кэширование данных" IsChecked="{Binding IsCachingOn, Mode=OneTime}"  IsCheckedChanged="CheckBox_IsCheckedChanged" />
+			</MenuItem>
+
 		</Menu>
 
 		<Grid Grid.Row="1" ColumnDefinitions="300,auto,*">
@@ -119,11 +124,17 @@
 									<Image Width="30" Source="/Assets/ColorIcons/icons8-edit-pencil-100.png"/>
 								</Button>
 
-								<Button Background="Transparent" Command="{Binding DeleteItemCommand}" Margin="20,0,0,0">
+								<Button Background="Transparent" Command="{Binding DeleteItemCommand}" Margin="20,0,0,0" ToolTip.Tip="Удалить выбранную запись" >
 									<Image Width="30" Source="/Assets/ColorIcons/icons8-delete-100.png"/>
 								</Button>
+
+								<Button Background="Transparent" Command="{Binding RefreshObjectCacheCommand}" Margin="20,0,0,0" ToolTip.Tip="Очистить кэш выбранного объекта" >
+									<Image Width="30" Source="/Assets/ColorIcons/icons8-refresh-100.png"/>
+								</Button>
 							</StackPanel>
-							<DataGrid x:Name="mainDataGrid"  AutoGenerateColumns="False" CanUserReorderColumns="True" CanUserSortColumns="True" CanUserResizeColumns="True" GridLinesVisibility="Horizontal" Grid.Row="1" ItemsSource="{Binding ItemsOfConObj}" SelectedItem="{Binding SelectedObjItem}" SelectionMode="Extended" SelectionChanged="DataGrid_SelectionChanged">
+							<Panel Grid.Row="1">
+								<TextBlock Text="{Binding LoadingText, Mode=OneWay}" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20" IsVisible="{Binding IsItemsLoading}"/>
+								<DataGrid x:Name="mainDataGrid" IsVisible="{Binding !IsItemsLoading}"  AutoGenerateColumns="False" CanUserReorderColumns="True" CanUserSortColumns="True" CanUserResizeColumns="True" GridLinesVisibility="Horizontal" Grid.Row="1" ItemsSource="{Binding ItemsOfConObj}" SelectedItem="{Binding SelectedObjItem}" SelectionMode="Extended" SelectionChanged="DataGrid_SelectionChanged">
 								<DataGrid.ContextMenu>
 									<ContextMenu>
 										<MenuItem Header="Редактировать свойства записи" Command="{Binding EditItemCommand}"  IsVisible="{Binding SelectedItemsOfConObj.Count, Converter={StaticResource ConMenuOpVisConv}}"/>
@@ -254,6 +265,7 @@
 
 								</DataGrid.Columns>
 							</DataGrid>
+							</Panel>
 							
 						</Grid>
 					</TabItem>

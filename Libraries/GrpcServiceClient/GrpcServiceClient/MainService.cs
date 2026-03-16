@@ -12,9 +12,9 @@ namespace GrpcServiceClient
 {
     public partial class MainService : IDisposable
     {
-        public MainService(string name, string password, string address = GrpcChannelOptionsHelper.Address)
+        public MainService(string name, string password, string address = GrpcChannelOptionsHelper.Address,long internetSpeedInBytes=long.MaxValue,int latency = 0 )
         {
-            Channel = GrpcChannel.ForAddress(address, GrpcChannelOptionsHelper.GetGrpcChannelOptions(name, password, address));
+            Channel = GrpcChannel.ForAddress(address, GrpcChannelOptionsHelper.GetGrpcChannelOptions(name, password, address, internetSpeedInBytes,latency));
             Client = new AccountingSystem.AccountingSystemClient(Channel);
             Address = address;
             Username = name;

@@ -1,6 +1,6 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Interactivity;
-
+using Avalonia.Threading;
 using AvaloniaComponents.MetaDataView.Helpers;
 
 using GrpcServiceClient;
@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ObjectsManager.ViewModels
@@ -52,18 +53,43 @@ namespace ObjectsManager.ViewModels
         public TabItem? SelectedTabItem { get => tSI; set { tSI = value; OnPropertyChanged(nameof(SelectedTabItem)); } }
 
 
-        public IEnumerable<TabItem> SetTabItems(TabControl tabControl)
+        private bool _IsLoading;
+        public bool IsLoading { get => _IsLoading; set { _IsLoading = value; OnPropertyChanged(nameof(IsLoading)); } }
+
+        public void ClearCache()
+        {
+            CacheManager.RemoveObjectMetadataCache(Obj.Id);
+        }
+
+        public async Task<IEnumerable<TabItem>> SetTabItems(TabControl tabControl,CancellationToken token)
         {
             var result = new List<TabItem>();
             this.MainTabControl = tabControl;
+            IsLoading = true;
             try
             {
-                var metaData = Service.GetAllObjectMetaData(Obj.Id);
-                var types = Service.GetAllMetaDataTypes();
+                var types = await Service.GetAllMetaDataTypesAsync();
                 AllMetaDataTypes = [.. types];
-                foreach (var item in metaData)
+
+                var data = CacheManager.GetObjectMetadataCache(Obj.Id);
+                if(!AppSettingsHelper.Settings.IsCachingOn || data is null)
+                {
+                    data = await Service.GetAllObjectMetaDataAsync(Obj.Id, token);
+                    if (AppSettingsHelper.Settings.IsCachingOn)
+                    {
+                        CacheManager.AddOrUpdateObjectMetadataCachee(Obj.Id, data);
+                    }
+                }
+
+                
+               
+                foreach (var item in data)
                 {
                     AddMetaDataToTabCtrl(item);
+                    if (token.IsCancellationRequested)
+                    {
+                        break;
+                    }
                 }
             }
             catch(Exception e)
@@ -71,23 +97,29 @@ namespace ObjectsManager.ViewModels
                 _ = MessageBoxManager.GetMessageBoxStandard(MessageBoxParamsHelper.GetErrorBoxParams($"Ошибка при загрузке метаданных объекта -> {e.Message}")).ShowAsync();
                 Win?.Close();
             }
-           
+            finally
+            {
+                IsLoading = false;
+            }
             return result;
         }
 
         private void AddMetaDataToTabCtrl(ObjectMetadata item)
         {
             var type = AllMetaDataTypes.FirstOrDefault(x => x.Id == item.TypeId)?.Name;
-            switch (type)
+            Dispatcher.UIThread.Invoke(() => 
             {
-                case "pdf":
-                    MainTabControl?.Items.Add(ViewerHelper.CreatePdfTabItem(item.Name, item.Data, item, Closed));
-                    break;
-                case "png":
-                case "jpg":
-                    MainTabControl?.Items.Add(ViewerHelper.CreateImageTabItem(item.Name, item.Data, item, Closed));
-                    break;
-            }
+                switch (type)
+                {
+                    case "pdf":
+                        MainTabControl?.Items.Add(ViewerHelper.CreatePdfTabItem(item.Name, item.Data, item, Closed));
+                        break;
+                    case "png":
+                    case "jpg":
+                        MainTabControl?.Items.Add(ViewerHelper.CreateImageTabItem(item.Name, item.Data, item, Closed));
+                        break;
+                }
+            });
         }
 
 
@@ -189,7 +221,5 @@ namespace ObjectsManager.ViewModels
                 await MessageBoxManager.GetMessageBoxStandard(MessageBoxParamsHelper.GetErrorBoxParams($"Ошибка при изменении метаданных записи -> {e.Message}")).ShowAsync();
             }
         }
-
-
     }
 }

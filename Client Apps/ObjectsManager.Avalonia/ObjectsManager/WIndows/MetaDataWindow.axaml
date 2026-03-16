@@ -7,6 +7,7 @@
         Title="Дополнительная информация по записи: "
 		Icon="/Assets/ColorIcons/icons8-home-50.png"
         xmlns:views="clr-namespace:ObjectsManager.Views"
-		WindowStartupLocation="CenterOwner">
-<views:MetaDataView/>
+		WindowStartupLocation="CenterOwner"
+        Closed="Window_Closed">
+<views:MetaDataView x:Name="myView"/>
 </Window>
